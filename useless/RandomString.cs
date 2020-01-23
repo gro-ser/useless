@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _
+namespace useless
 {
-    class RandomString
+    public class RandomString
     {
         private static string
             _digits = "09",

@@ -46,4 +46,10 @@ class TabFormControl:TabControl
         (form.Tag as TabControl).TabPages.Add(tab);
         tab.Select();
     }
+
+    private void InitializeComponent()
+    {
+            this.SuspendLayout();
+            this.ResumeLayout(false);
+    }
 }

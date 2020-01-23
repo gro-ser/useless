@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -10,7 +9,7 @@ using System.Windows.Forms;
 using System.Speech.Synthesis;
 using System.Speech.AudioFormat;
 
-namespace _
+namespace useless
 {
     public partial class Speaker : Form
     {
@@ -22,6 +21,7 @@ namespace _
         public Speaker()
         {
             InitializeComponent();
+            
         }
 
         private void Speaker_Load(object sender, EventArgs e)

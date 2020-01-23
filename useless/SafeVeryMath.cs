@@ -1,5 +1,5 @@
 ﻿using System;
-public class SafeVeryMath<T> : _.VeryMath<T>
+public class SafeVeryMath<T> : useless.VeryMath<T>
 {
     public override T convert(IConvertible value)
     {

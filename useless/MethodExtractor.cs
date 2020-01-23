@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.OleDb;
 using System.Numerics;
 //using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _
+namespace useless
 {
-    class MethodExtractor
+    public class MethodExtractor
     {
         /* str:    "[[[<assembly>|]<namespace>|]<class>|]<method>[|<parameters>[|<cast_type>]]"
-         * priority:[     5      |     4      |    3   |    0     |      1      |     2     ]
+         * priority:[     5      |     4      |    3   |    0     |      1      |     2      ]
          * parameters: "" | parameters, <type>
          * assembly     -- название сборки              /def:"mscorlib"
          * namespace    -- название пространства имен   /def:"System"
@@ -28,6 +26,7 @@ namespace _
             cls = "Math",
             prm = "R",
             cst = "R"; // null|"" => no cast needed
+
         string
             assembly = ass,
             @namespace = nam,
@@ -61,11 +60,10 @@ namespace _
                 case 1: (method) = (names[0]); break;
                 case 2: (method, parameters) = (names[0], names[1]); break;
                 case 3: (method, parameters, cast) = (names[0], names[1], names[2]); break;
-                case 4: (method, parameters, cast, @class) = (names[0], names[1], names[2], names[3]); break;
-                case 5: (method, parameters, cast, @class, @namespace) = (names[0], names[1], names[2], names[3], names[4]); break;
-                case 6:
-                    (method, parameters, cast, @class, @namespace, assembly) =
-                     (names[3], names[4], names[5], names[2], names[1], names[0]); break;
+                case 4: (@class, method, parameters, cast) = (names[0], names[1], names[2], names[3]); break;
+                case 5: (@namespace, @class, method, parameters, cast) = (names[0], names[1], names[2], names[3], names[4]); break;
+                case 6: (assembly, @namespace, @class, method, parameters, cast) =
+                     (names[0], names[1], names[2], names[3], names[4], names[5]); break;
                 default: throw new Exception("invalid parameters count");
             }
         }
@@ -86,8 +84,7 @@ namespace _
             if ((ind = Array.IndexOf(localTypes, type)) != -1)
                 return localNames[ind];
             var ass = type.Assembly;
-            if (ass == mscorlib || ass == current
-                )
+            if (ass == mscorlib || ass == current)
                 return type.Namespace == "System" ? type.Name : type.FullName;
             return type.AssemblyQualifiedName;
         }
@@ -103,7 +100,7 @@ namespace _
 
         public MethodInfo GetMethodInfo()
         {
-            var ass = Assembly.Load(assembly);
+            var ass = Assembly.LoadWithPartialName(assembly);
             var typ = GetType(ass, @namespace + "." + @class);
             MethodInfo met;
             try { met = typ?.GetMethod(method, GetParametersType()); }
@@ -149,5 +146,7 @@ namespace _
             => assembly?.GetType(str, false, true);
 
         static Assembly current = Assembly.GetExecutingAssembly(), mscorlib = Assembly.GetAssembly(typeof(void));
+
+        public static MethodInfo GetMethodFast(string desc) => new MethodExtractor(desc).GetMethodInfo();
     }
 }

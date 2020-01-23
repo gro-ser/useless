@@ -1,27 +1,27 @@
 ﻿using System;
 
-delegate TR Curried<in T1, out TR>(T1 arg);
+delegate TResult Curried<in T1, out TResult>(T1 arg);
 
-delegate Curried<T1, TR>
-    Curried<in T1, in T2, out TR>(T2 arg);
+delegate Curried<T2, TR>
+    Curried<in T1, in T2, out TR>(T1 arg);
 
-delegate Curried<T1, T2, TR>
-    Curried<in T1, in T2, in T3, out TR>(T3 arg);
+delegate Curried<T2, T3, TR>
+    Curried<in T1, in T2, in T3, out TR>(T1 arg);
 
-delegate Curried<T1, T2, T3, TR>
-    Curried<in T1, in T2, in T3, in T4, out TR>(T4 arg);
+delegate Curried<T2, T3, T4, TR>
+    Curried<in T1, in T2, in T3, in T4, out TR>(T1 arg);
 
-delegate Curried<T1, T2, T3, T4, TR>
-    Curried<in T1, in T2, in T3, in T4, in T5, out TR>(T5 arg);
+delegate Curried<T2, T3, T4, T5, TR>
+    Curried<in T1, in T2, in T3, in T4, in T5, out TR>(T1 arg);
 
-delegate Curried<T1, T2, T3, T4, T5, TR>
-    Curried<in T1, in T2, in T3, in T4, in T5, in T6, out TR>(T6 arg);
+delegate Curried<T2, T3, T4, T5, T6, TR>
+    Curried<in T1, in T2, in T3, in T4, in T5, in T6, out TR>(T1 arg);
 
-delegate Curried<T1, T2, T3, T4, T5, T6, TR>
-    Curried<in T1, in T2, in T3, in T4, in T5, in T6, in T7, out TR>(T7 arg);
+delegate Curried<T2, T3, T4, T5, T6, T7, TR>
+    Curried<in T1, in T2, in T3, in T4, in T5, in T6, in T7, out TR>(T1 arg);
 
-delegate Curried<T1, T2, T3, T4, T5, T6, T7, TR>
-    Curried<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8, out TR>(T8 arg);
+delegate Curried<T2, T3, T4, T5, T6, T7, T8, TR>
+    Curried<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8, out TR>(T1 arg);
 
 public class Currying
 {
@@ -30,7 +30,7 @@ public class Currying
         (int start, int step, int count)
     {
         int[] result = new int[count];
-        for (int i = 0, value = start; i < count; i++, value+=step)
+        for (int i = 0, value = start; i < count; i++, value += step)
             result[i] = value;
         return result;
     }
@@ -85,7 +85,7 @@ public class Currying
             Func<int, Func<int, int[]>> startsWith2 = CreateRange_func(2);
             Print(startsWith2(0)(3));
 
-            Func<int, int[]> evenNums =  startsWith2(2);
+            Func<int, int[]> evenNums = startsWith2(2);
             Print(evenNums(3));
             Print(evenNums(5));
         }
@@ -97,7 +97,7 @@ public class Currying
             Curried<int, int, int[]> startsWith2 = CreateRange_curry(2);
             Print(startsWith2(0)(3));
 
-            Curried<int, int[]> evenNums =  startsWith2(2);
+            Curried<int, int[]> evenNums = startsWith2(2);
             Print(evenNums(3));
             Print(evenNums(5));
         }

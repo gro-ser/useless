@@ -6,10 +6,8 @@ namespace TestVersions
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            float a = .0f;
-            double b = .0d;
         }
     }
 }

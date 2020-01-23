@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Numerics;
 
-namespace _
+namespace useless
 {
     class nums
     {
@@ -61,14 +61,15 @@ namespace _
         }
         private static void expTest(int length, Stopwatch sw, BigInteger test, string category)
         {
+            const int mod = 12;
             Console.WriteLine($"\nTest on {category} numbers");
             sw.Restart();
             for (int i = 0; i < length; i++)
-                exp_ez(test, i % 2);
+                exp_ez(test, i % mod);
             Console.WriteLine("exp_ez() => {0}", sw.Elapsed);
             sw.Restart();
             for (int i = 0; i < length; i++)
-                exp_my(test, i % 2);
+                exp_my(test, i % mod);
             Console.WriteLine("exp_my() => {0}", sw.Elapsed);
         }
     }

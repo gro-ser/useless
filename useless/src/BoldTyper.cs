@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace _
+namespace useless
 {
     class BoldTyper
     {
@@ -75,7 +72,7 @@ namespace _
                 ['9'] = "𝟡",
             };
 
-        static string Enc(string str)
+        public static string Encode(string str)
         {
             var sb = new StringBuilder(str.Length * 2);
             foreach (var chr in str)

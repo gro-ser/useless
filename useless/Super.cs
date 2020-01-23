@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _
+namespace useless
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct SafePtr

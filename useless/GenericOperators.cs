@@ -7,8 +7,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace _
+namespace useless
 {
+    using Enum = System.Enum;
     public interface IOperator<T>
     {
         T sum(T a, T b);// +
@@ -230,7 +231,7 @@ class {0}Calculator : SafeVeryMath<{0}>
             var newClassCode = string.Format(@class, type.Name, nspace, sb.ToString());
             File.WriteAllText(type.Name + "Calculator.cs", newClassCode);
             return null;
-            newClassCode= nameof(VeryMath<T>.sum);
+            //newClassCode= nameof(VeryMath<T>.sum);
         }
     }
 

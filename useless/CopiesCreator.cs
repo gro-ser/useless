@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace _
+namespace useless
 {
     using props = System.Collections.Generic.Dictionary<string, object>;
     public class CopiesCreator<T> where T : new()

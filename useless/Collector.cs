@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace _
+namespace useless
 {
     [StructLayout(LayoutKind.Explicit)]
     struct Collector

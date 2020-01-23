@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _
+namespace useless
 {
     /// <summary>
     /// Class to allow operations (like Add, Multiply, etc.) for generic types. This type should allow these operations themselves.
