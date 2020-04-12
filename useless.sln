@@ -11,7 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinuxFSEmulator", "LinuxFSE
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VB01", "VB01\VB01.vbproj", "{2CC51BA3-5BFC-4C52-877A-274202EB3CB4}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedCSharpProject1", "C:\Users\groser\source\repos\SharedCSharpProject1\SharedCSharpProject1.shproj", "{73A37021-A7A3-4A00-B301-6892A710ED2C}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		C:\Users\groser\source\repos\SharedCSharpProject1\SharedCSharpProject1.projitems*{73a37021-a7a3-4a00-b301-6892a710ed2c}*SharedItemsImports = 13
+		C:\Users\groser\source\repos\SharedCSharpProject1\SharedCSharpProject1.projitems*{b3328365-a601-408e-a1d4-f6628accdce7}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64

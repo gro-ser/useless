@@ -2,28 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
-using System.IO;
-using System.IO.Compression;
-//using System.Linq;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Numerics;
-using System.Runtime.InteropServices;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Reflection;
 using static System.Linq.Enumerable;
 using static System.Math;
-using num = System.Numerics;
-using big = System.Numerics.BigInteger;
+using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Threading;
+using System.Security;
+using System.IO;
+using GraphTasks;
 
 #nullable enable
 
@@ -436,23 +433,243 @@ namespace useless
 
         static string SortDist(this string str)
         => string.Join("", str.OrderBy(x => x));
+
+        public static StackTrace GetStackTrace(int n)
+        {
+            if (n == 0) return new StackTrace();
+            return GetStackTrace(n - 1);
+        }
+
+        static decimal StringToDecimal(string str)
+        {
+            var bytes = new BitArray(Encoding.UTF8.GetBytes(str));
+            var tmp = new int[4];
+            bytes.CopyTo(tmp, 0);
+            return new decimal(tmp);
+        }
+
+        static string DecimalToString(decimal x)
+        {
+            var bits = decimal.GetBits(x);
+            var arr = new BitArray(bits);
+            arr.Length = 3 * 4 * 8;
+            var res = new byte[3 * 4];
+            arr.CopyTo(res, 0);
+            var str = Encoding.UTF8.GetString(res);
+            return str;
+        }
+
+        static Program()
+        {
+            return;
+            var dec = typeof(decimal);
+            dec.GetField("Zero").SetValue(null, StringToDecimal("Hello world!"));
+            dec.GetField("One").SetValue(null, StringToDecimal("Huli smotriw"));
+            dec.GetField("MinusOne").SetValue(null, StringToDecimal("BAXAX magic?"));
+            dec.GetField("MinValue").SetValue(null, StringToDecimal("BAXAX magic?"));
+            dec.GetField("MaxValue").SetValue(null, StringToDecimal("BAXAX magic?"));
+        }
+
+        static BigInteger StrToBig(string str) => new BigInteger(Encoding.UTF8.GetBytes(str));
+        static string BigToStr(BigInteger big) => Encoding.Default.GetString(big.ToByteArray());
+
+        public static void CalliTest()
+        {
+            AppDomain myDomain = Thread.GetDomain();
+            AssemblyName myAsmName = new AssemblyName
+            { Name = "mda" };
+
+            AssemblyBuilder myAsmBuilder = myDomain.DefineDynamicAssembly(
+                myAsmName,
+                AssemblyBuilderAccess.RunAndSave);
+
+            ModuleBuilder myModBuilder = myAsmBuilder.DefineDynamicModule(
+                "mda", "mda.dll");
+
+            TypeBuilder myTypeBuilder = myModBuilder.DefineType("CalliTest",
+                TypeAttributes.Public);
+
+            MethodBuilder myMthdBuilder = myTypeBuilder.DefineMethod("Calli",
+                MethodAttributes.Public | MethodAttributes.Static,
+                typeof(void),
+                new Type[] { typeof(string) });
+
+            ILGenerator myIL = myMthdBuilder.GetILGenerator();
+
+            myIL.Emit(OpCodes.Ldarg_0);
+            myIL.Emit(OpCodes.Ldarg_1);
+            myIL.EmitCalli(OpCodes.Calli,
+                CallingConvention.StdCall,
+                typeof(void),
+                new Type[] { typeof(string) });
+            myIL.Emit(OpCodes.Ret);
+            myTypeBuilder.CreateType();
+            myAsmBuilder.Save("mda.dll");
+        }
+        static MethodInfo cw = ((Action<int>)Console.WriteLine).Method;
+        public static Action<int> Create(CallingConvention conv)
+        {
+            DynamicMethod dm = new DynamicMethod(
+                "prnt",
+                MethodAttributes.Public | MethodAttributes.Static,
+                CallingConventions.Standard,
+                typeof(void),
+                new Type[] { typeof(int) },
+                typeof(object),
+                false);
+            var il = dm.GetILGenerator();
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldftn, cw);
+            il.EmitCalli(OpCodes.Calli,
+                conv,
+                typeof(void),
+                new Type[] { typeof(int) });
+            il.Emit(OpCodes.Ret);
+            return (Action<int>)dm.CreateDelegate(typeof(Action<int>));
+        }
+
+        static void AddDistinct(this List<char> list, char ch)
+        {
+            if (!list.Contains(ch)) list.Add(ch);
+        }
+
+        static string ExecMacro(string file)
+        {
+            var lines = File.ReadAllLines(file);
+            var buf = new StringBuilder();
+            var macro = new Dictionary<string, string>();
+            foreach (var line in lines)
+            {
+                if (line.StartsWith("#define "))
+                {
+                    int ind = line.IndexOf(' ', 8);
+                    if (-1 == ind)
+                    {
+                        buf.Append(line);
+                    }
+                    else
+                    {
+                        macro.Add(line.Substring(8, ind - 8), line.Substring(ind + 1));
+                    }
+                }
+                else
+                {
+                    foreach (var part in line.Split())
+                    {
+                        buf.Append(macro.TryGetValue(part, out var val) ? val : part);
+                    }
+                }
+                buf.AppendLine();
+            }
+            return buf.ToString();
+        }
+
+        static string GetNumFromOnes(int num)
+        {
+            if (num == 0) return "1 - 1";
+            if (num == 1) return "1";
+            if (num < 0)
+            {
+                if (num == int.MinValue)
+                    return "1 << " + GetNumFromOnes(31);
+                return $"-({GetNumFromOnes(-num)})";
+            }
+            string shift = null;
+            double log;
+            if ((log = Math.Log(num, 2)) == (int)log)
+                shift = "";
+            else if ((log = Math.Log(num - 1, 2)) == (int)log)
+                shift = " + 1";
+            else if ((log = Math.Log(num + 1, 2)) == (int)log)
+                shift = " - 1";
+            if (shift != null)
+                return $"(1 << {GetNumFromOnes((int)log)}){shift}";
+            int x = 1 << (int)log;
+            return $"({GetNumFromOnes(x)}) | ({GetNumFromOnes(num ^ x)})";
+            return $"{num}";
+        }
+
         [STAThread]
         static void Main()
         {
-            Enumeration.TypeCode code = Enumeration.TypeCode.Object;
-
-            float addBit(float x, int bit = 1) =>
-                BitConverter.ToSingle(
-                    BitConverter.GetBytes(
-                        bit + BitConverter.ToInt32(
-                            BitConverter.GetBytes(x), 0)), 0);
-
-            float x = 0;
-            for (int i = 0; i < 50; i++)
+            (string, string)[] task1Data =
             {
-                Console.WriteLine("{0}: {1}", i, x);
-                x = addBit(x);
-            }
+                (@"
+3
+WXX
+WYX
+XW", "WXY"),
+                (@"
+3
+X
+Y
+A", "XYA"),
+                (@"
+11
+XSD
+XDS
+AXX
+AXD
+ASSSS
+ADSS
+DSS
+DSDAX
+DSDD
+DA
+DAXS","XSAD"),
+                (@"
+1
+Z", "Z"),
+                (@"
+7
+ZZ
+ZCB
+BCZH
+BH
+BBHC
+BBBZ
+BBBH", "ZCHB"),
+                (@"
+2
+AAA
+ABC", "CAB")
+            };
+            Console.WriteLine("Task1 passed: {0}", GraphTask.IsSolved(new Task1(), !true, task1Data));
+
+            (string, string)[] task3Data =
+            {
+                (@"
+4
+1 2 3 4
+0 1 1 0
+0 0 0 1
+0 0 0 1
+0 0 0 0",
+@"
+0 3 4 8
+0 0 0 6
+0 0 0 7
+0 0 0 0"),
+                (@"
+4
+1 2 3 4
+0 0 0 0
+1 0 0 0
+0 1 0 0
+0 0 1 0",
+@"
+0 0 0 0
+3 0 0 0
+6 5 0 0
+10 9 7 0"),
+                (@"
+1
+1
+1", "5\n")
+            };
+            Console.WriteLine("Task3 passed: {0}", GraphTask.IsSolved(new Task3(), !true, task3Data));
+
+            Console.ReadLine();
             return;
 
             var lambda = BrainFuck.LambdaSource(@"+[>+]");
@@ -466,6 +683,7 @@ namespace useless
             Console.WriteLine(" --end program-- ");
             //Console.ReadLine();
         }
+
         static void write(params object[] array)
             => Console.Write(string.Concat(array));
 
@@ -552,7 +770,6 @@ namespace useless
             while (value != 0 && list.Count < 15);
             list.Reverse();
             return list.ToArray();
-            
         }
 
         static List<string> combine(string Str)
