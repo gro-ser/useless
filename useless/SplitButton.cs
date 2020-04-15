@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -12,48 +8,32 @@ namespace useless
 {
     public class SplitButton : Button
     {
-        PushButtonState _state;
+        private PushButtonState _state;
+        private const int SplitSectionWidth = 18;
+        private static readonly int BorderSize = SystemInformation.Border3DSize.Width * 2;
+        private bool skipNextOpen;
+        private Rectangle dropDownRectangle;
+        private bool showSplit;
+        private bool isSplitMenuVisible;
+        private ContextMenuStrip m_SplitMenuStrip;
+        private ContextMenu m_SplitMenu;
+        private TextFormatFlags textFormatFlags = TextFormatFlags.Default;
 
-
-        const int SplitSectionWidth = 18;
-
-        static int BorderSize = SystemInformation.Border3DSize.Width * 2;
-        bool skipNextOpen;
-        Rectangle dropDownRectangle;
-        bool showSplit;
-
-        bool isSplitMenuVisible;
-
-
-        ContextMenuStrip m_SplitMenuStrip;
-        ContextMenu m_SplitMenu;
-
-        TextFormatFlags textFormatFlags = TextFormatFlags.Default;
-
-        public SplitButton()
-        {
-            AutoSize = true;
-        }
+        public SplitButton() => AutoSize = true;
 
         #region Properties
 
         [Browsable(false)]
         public override ContextMenuStrip ContextMenuStrip
         {
-            get
-            {
-                return SplitMenuStrip;
-            }
-            set
-            {
-                SplitMenuStrip = value;
-            }
+            get => SplitMenuStrip;
+            set => SplitMenuStrip = value;
         }
 
         [DefaultValue(null)]
         public ContextMenu SplitMenu
         {
-            get { return m_SplitMenu; }
+            get => m_SplitMenu;
             set
             {
                 //remove the event handlers for the old SplitMenu
@@ -69,7 +49,9 @@ namespace useless
                     value.Popup += SplitMenu_Popup;
                 }
                 else
+                {
                     ShowSplit = false;
+                }
 
                 m_SplitMenu = value;
             }
@@ -78,10 +60,7 @@ namespace useless
         [DefaultValue(null)]
         public ContextMenuStrip SplitMenuStrip
         {
-            get
-            {
-                return m_SplitMenuStrip;
-            }
+            get => m_SplitMenuStrip;
             set
             {
                 //remove the event handlers for the old SplitMenuStrip
@@ -99,8 +78,9 @@ namespace useless
                     value.Opening += SplitMenuStrip_Opening;
                 }
                 else
+                {
                     ShowSplit = false;
-
+                }
 
                 m_SplitMenuStrip = value;
             }
@@ -124,10 +104,7 @@ namespace useless
 
         private PushButtonState State
         {
-            get
-            {
-                return _state;
-            }
+            get => _state;
             set
             {
                 if (!_state.Equals(value))
@@ -221,7 +198,7 @@ namespace useless
             }
         }
 
-        bool isMouseEntered;
+        private bool isMouseEntered;
 
         protected override void OnMouseEnter(EventArgs e)
         {
@@ -378,10 +355,8 @@ namespace useless
         private void PaintTextandImage(Graphics g, Rectangle bounds)
         {
             // Figure out where our text and image should go
-            Rectangle text_rectangle;
-            Rectangle image_rectangle;
 
-            CalculateButtonTextAndImageLayout(ref bounds, out text_rectangle, out image_rectangle);
+            CalculateButtonTextAndImageLayout(ref bounds, out Rectangle text_rectangle, out Rectangle image_rectangle);
 
             //draw the image
             if (Image != null)
@@ -771,12 +746,9 @@ namespace useless
             }
         }
 
-        void SplitMenuStrip_Opening(object sender, CancelEventArgs e)
-        {
-            isSplitMenuVisible = true;
-        }
+        private void SplitMenuStrip_Opening(object sender, CancelEventArgs e) => isSplitMenuVisible = true;
 
-        void SplitMenuStrip_Closing(object sender, ToolStripDropDownClosingEventArgs e)
+        private void SplitMenuStrip_Closing(object sender, ToolStripDropDownClosingEventArgs e)
         {
             isSplitMenuVisible = false;
 
@@ -788,11 +760,7 @@ namespace useless
             }
         }
 
-
-        void SplitMenu_Popup(object sender, EventArgs e)
-        {
-            isSplitMenuVisible = true;
-        }
+        private void SplitMenu_Popup(object sender, EventArgs e) => isSplitMenuVisible = true;
 
         protected override void WndProc(ref Message m)
         {

@@ -1,16 +1,15 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 
 namespace MicroCalculator
 {
-    public class Calculator
+    public class MicroCalculator
     {
-        Process calculator;
-        StreamWriter input;
-        StreamReader output;
+        private readonly Process calculator;
+        private readonly StreamWriter input;
+        private readonly StreamReader output;
 
-        public Calculator()
+        public MicroCalculator()
         {
             calculator = new Process()
             {
@@ -43,7 +42,7 @@ namespace MicroCalculator
             output.Close();
         }
 
-        ~Calculator()
+        ~MicroCalculator()
         {
             Close();
         }

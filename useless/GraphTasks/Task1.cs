@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TestingTasks;
 
 namespace GraphTasks
 {
-    class Task1 : GraphTask
+    internal class Task1 : TestingTask
     {
         protected override void Main()
         {
@@ -14,7 +12,8 @@ namespace GraphTasks
             SortedSet<char> alphabet = new SortedSet<char>();
             Dictionary<char, SortedSet<char>> graph = new Dictionary<char, SortedSet<char>>();
             string pred, curr = ReadLexem();
-            foreach (char c in curr) alphabet.Add(c);
+            foreach (char c in curr)
+                alphabet.Add(c);
             for (int i = 1; i < length; i++)
             {
                 pred = curr;
@@ -24,17 +23,20 @@ namespace GraphTasks
                     len = Math.Min(pred.Length, curr.Length);
                     j < len; j++)
                 {
-                    if (added) alphabet.Add(curr[j]);
+                    if (added)
+                    {
+                        alphabet.Add(curr[j]);
+                    }
                     else if (pred[j] != curr[j])
                     {
                         char from = pred[j], to = curr[j];
-                        if(graph.TryGetValue(from, out var edge))
+                        if (graph.TryGetValue(from, out SortedSet<char> edge))
                         {
                             edge.Add(to);
                         }
                         else
                         {
-                            graph[from] = new SortedSet<char>{ to };
+                            graph[from] = new SortedSet<char> { to };
                         }
                         alphabet.Add(from);
                         alphabet.Add(to);
@@ -63,7 +65,7 @@ namespace GraphTasks
                 buf = x + buf;
                 foreach (char y in alphabet)
                 {
-                    if(graph.TryGetValue(y, out var edge) && edge.Contains(x))
+                    if (graph.TryGetValue(y, out SortedSet<char> edge) && edge.Contains(x))
                     {
                         edge.Remove(x);
                         if (0 == edge.Count)

@@ -1,26 +1,25 @@
-﻿using System;
+﻿using GraphTasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TestingTasks;
 using static System.Linq.Enumerable;
 using static System.Math;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
-using System.Security;
-using System.IO;
-using GraphTasks;
 
 #nullable enable
 
@@ -28,7 +27,7 @@ namespace useless
 {
     public static class Program
     {
-        static string[] GetTags(string text)
+        private static string[] GetTags(string text)
         {
             List<string> list = new List<string>();
             int index = 0, len, length = text.Length;
@@ -36,7 +35,13 @@ namespace useless
             {
                 len = 0;
                 for (int i = index; i < length; ++i, ++len)
-                    if (char.IsWhiteSpace(text[i]) || text[i] == '#') break;
+                {
+                    if (char.IsWhiteSpace(text[i]) || text[i] == '#')
+                    {
+                        break;
+                    }
+                }
+
                 list.Add(text.Substring(index, len));
             }
             return list.ToArray();
@@ -57,7 +62,8 @@ namespace useless
 
         public static string ToGothic(string str)
         {
-            var sb = new StringBuilder(str); char x;
+            StringBuilder sb = new StringBuilder(str);
+            char x;
             for (int i = sb.Length - 1; i >= 0; i--)
             {
                 x = sb[i];
@@ -67,26 +73,32 @@ namespace useless
             return sb.ToString();
         }
 
-        static long GCD(long a, long b)
+        private static long GCD(long a, long b)
         {
             long c = b == 0 ? a : a % b;
-            while (c != 0) (_, b, c) = (b, c, b % c);
+            while (c != 0)
+                (_, b, c) = (b, c, b % c);
             return Abs(b);
         }
 
-        static long gcd(long a, long b)
+        private static long Gcd(long a, long b)
         {
             for (long c = b == 0 ? a : a % b;
-                c != 0; a = b, b = c, c = a % b) ;
+                c != 0; a = b, b = c, c = a % b)
+            {
+                ;
+            }
+
             return Abs(b);
         }
 
-        static double infSearch(
+        private static double InfSearch(
             Func<double, bool> pred,
             Func<double, double> step,
             double start = 1)
         {
-            double value = start; start = double.NaN;
+            double value = start;
+            start = double.NaN;
             while (pred(value) && start != value)
             {
                 //(value, start) = (step(value), value);
@@ -96,7 +108,7 @@ namespace useless
             return start;
         }
 
-        static T[] insert<T>(T[] _args, int ind, T value)
+        private static T[] Insert<T>(T[] _args, int ind, T value)
         {
             int len = _args.Length;
             T[] args = new T[len + 1];
@@ -106,15 +118,15 @@ namespace useless
             return args;
         }
 
-        static void testArglist(__arglist)
+        private static void testArglist(__arglist)
         {
             const int newint = 10;
             const double newdouble = 0.1;
-            var iter = new ArgIterator(__arglist);
+            ArgIterator iter = new ArgIterator(__arglist);
             int length = iter.GetRemainingCount();
             for (int i = 0; i < length; i++)
             {
-                var type = Type.GetTypeFromHandle(iter.GetNextArgType());
+                Type type = Type.GetTypeFromHandle(iter.GetNextArgType());
                 if (type == typeof(int))
                 {
                     int v = __refvalue(iter.GetNextArg(), int);
@@ -133,13 +145,14 @@ namespace useless
             }
         }
 
-        static void printArr<T>(T[] arr, string? format = null)
+        private static void printArr<T>(T[] arr, string? format = null)
         {
             string tostr()
             {
                 int length = arr.Length;
-                if (length == 0) return "[]";
-                var sb = new StringBuilder("[").AppendFormat(format, arr[0]);
+                if (length == 0)
+                    return "[]";
+                StringBuilder sb = new StringBuilder("[").AppendFormat(format, arr[0]);
                 for (int i = 1; i < length; i++)
                     sb.Append(", ").AppendFormat(format, arr[i]);
                 return sb.Append(']').ToString();
@@ -147,47 +160,49 @@ namespace useless
             Console.WriteLine(tostr());
         }
 
-        static IFormatProvider provider = CultureInfo.GetCultureInfo("en-en");
+        private static readonly IFormatProvider provider = CultureInfo.GetCultureInfo("en-en");
 
-        static string Format(this string format, params object[] args)
-        {
-            return string.Format(provider, format, args: args);
-        }
+        private static string Format(this string format, params object[] args) => string.Format(provider, format, args: args);
 
-        static string Format(this string format, params (string name, object obj)[] args)
+        private static string Format(this string format, params (string name, object obj)[] args)
         {
             Regex regex = new Regex(@"^\s*(\w+)\s*$");
             int length = args.Length;
-            var objs = new object[length];
+            object[] objs = new object[length];
             for (int i = 0; i < length; i++)
             {
-                var arg = args[i];
+                (string name, object obj) arg = args[i];
                 objs[i] = arg.obj;
-                var m = regex.Match(arg.name);
-                if (!m.Success) throw new ArgumentException(nameof(arg.name));
-                var pattern = $@"{{\s*{m.Groups[1].Value}(?=.*}})";
+                Match m = regex.Match(arg.name);
+                if (!m.Success)
+                    throw new ArgumentException(nameof(arg.name));
+                string pattern = $@"{{\s*{m.Groups[1].Value}(?=.*}})";
                 format = Regex.Replace(format, pattern, "{" + i);
             }
             return string.Format(provider, format, objs);
         }
 
-        static string DynamicFormat(this string format, object obj)
+        private static string DynamicFormat(this string format, object obj)
         {
-            if (obj is null) return "";
-            var list = new Stack<object?>();
-            var regex = new Regex(@"(?<!{){\s*(\w+).*?(?=})");
-            var matches = regex.Matches(format);
-            var type = obj.GetType();
-            var sb = new StringBuilder(format);
+            if (obj is null)
+                return "";
+            Stack<object?> list = new Stack<object?>();
+            Regex regex = new Regex(@"(?<!{){\s*(\w+).*?(?=})");
+            MatchCollection matches = regex.Matches(format);
+            Type type = obj.GetType();
+            StringBuilder sb = new StringBuilder(format);
             for (int i = matches.Count - 1; i >= 0; i--)
             {
                 object? value;
-                var match = matches[i];
-                var name = match.Groups[1].Value;
-                if ("this" == name) value = obj;
+                Match match = matches[i];
+                string name = match.Groups[1].Value;
+                if ("this" == name)
+                {
+                    value = obj;
+                }
                 else
                 {
-                    var prop = type.GetProperty(name);
+                    PropertyInfo prop = type.GetProperty(name);
                     value = prop?.GetValue(obj);
                 }
                 list.Push(value);
@@ -197,7 +212,7 @@ namespace useless
             return string.Format(sb.ToString(), list.ToArray());
         }
 
-        static object Elapsed(Stopwatch s) => s.ElapsedTicks.ToString("N");
+        private static object Elapsed(Stopwatch s) => s.ElapsedTicks.ToString("N");
 
 
         public static void AddDistinct<T>(
@@ -219,26 +234,30 @@ namespace useless
             if (sources.Length != length)
                 throw new Exception();
             for (int i = 0; i < length; i++)
+            {
                 if (string.IsNullOrEmpty(sources[i]))
                     sources[i] = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\";
                 else if ((dist = sources[i].Distinct()).Count() != sources[i].Length)
                     sources[i] = dist.Aggregate(new StringBuilder(), (sb, v) => sb.Append(v)).ToString();
+            }
 
-            var results = new List<char>[length];
+            List<char>[] results = new List<char>[length];
 
             for (int i = 0; i < length; i++)
                 results[i] = new List<char>();
 
-            var regexes = patterns.Select(x => new Regex($"^{x}$", RegexOptions.IgnoreCase));
-            var sb = new StringBuilder(length);
+            global::System.Collections.Generic.IEnumerable<global::System.Text.RegularExpressions.Regex> regexes = patterns.Select(x => new Regex($"^{x}$", RegexOptions.IgnoreCase));
+            StringBuilder sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
                 sb.Append(sources[i][0]);
             do
             {
-                var str = sb.ToString();
+                string str = sb.ToString();
                 if (regexes.All(r => r.IsMatch(str)))
+                {
                     for (int i = 0; i < length; i++)
                         results[i].AddDistinct(str[i]);
+                }
 
                 bool lastOfRange = true;
 
@@ -247,15 +266,17 @@ namespace useless
                     int ind = sources[i].IndexOf(sb[i]) + 1;
                     if (ind < sources[i].Length)
                         lastOfRange = false;
-                    else ind = 0;
+                    else
+                        ind = 0;
                     sb[i] = sources[i][ind];
                 }
 
-                if (lastOfRange) break;
+                if (lastOfRange)
+                    break;
             }
             while (true);
 
-            var tmp = new string[length];
+            string[] tmp = new string[length];
             for (int i = 0; i < length; i++)
                 tmp[i] = string.Join("", results[i]);
 
@@ -269,11 +290,11 @@ namespace useless
             bool removeEmptyEntries = false)
         {
             // setup
-            var splitted = new string[count--];
+            string[] splitted = new string[count--];
             int index = 0, v = 0, len = str.Length;
             string tmp;
             // action
-            var sb = new StringBuilder(len);
+            StringBuilder sb = new StringBuilder(len);
             while (index < count && v < len)
             {
                 if (pred(str[v]))
@@ -283,7 +304,11 @@ namespace useless
                         splitted[index++] = tmp;
                     sb.Clear();
                 }
-                else sb.Append(str[v]);
+                else
+                {
+                    sb.Append(str[v]);
+                }
+
                 ++v;
             }
             while (v < len)
@@ -296,10 +321,11 @@ namespace useless
             return splitted;
         }
 
-        static T ChangeBounds<T>(T array, int lower, int length)
+        private static T ChangeBounds<T>(T array, int lower, int length)
             where T : class
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
             if (!(array is Array arr) || arr.Rank != 1)
                 throw new ArgumentException("T must be array type with rank = 1.");
             Array res = Array.CreateInstance(
@@ -308,10 +334,12 @@ namespace useless
             Array.Copy(arr, arr.GetLowerBound(0), res, lower, minLen);
             return (res as T)!;
         }
-        static T ChangeBounds<T>(T array, int[] lower, int[] length)
+
+        private static T ChangeBounds<T>(T array, int[] lower, int[] length)
             where T : class
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
             if (!(array is Array arr))
                 throw new ArgumentException("T must be array type with rank = 1.");
             Array res = Array.CreateInstance(
@@ -340,10 +368,13 @@ namespace useless
             int* v = (int*)p;
             int end = to ?? array.Length;
             for (int i = from; i < end; ++i)
+            {
                 if (i == 0)
                     Console.Write("[0] " + v[i] + " ");
                 else
                     Console.Write(v[i] + " ");
+            }
+
             Console.WriteLine();
         }
 
@@ -362,7 +393,7 @@ namespace useless
             return Array.CreateInstance(typeof(byte), length, bounds);
         }
 
-        static void printBounds(Array array)
+        private static void printBounds(Array array)
         {
             Console.Write("Lower bounds: ");
             for (int i = 0; i < array.Rank; i++)
@@ -370,11 +401,11 @@ namespace useless
             Console.WriteLine();
         }
 
-        static void ArrTest(int length = 4)
+        private static void ArrTest(int length = 4)
         {
             for (int i = 1; i < length; i++)
             {
-                var arr = CreateArray(i);
+                Array arr = CreateArray(i);
                 Console.WriteLine($"Rank = {i}, array type = {arr.GetType()}");
                 prntUnsafe(arr, to: 10);
                 printBounds(arr);
@@ -384,32 +415,35 @@ namespace useless
             }
         }
 
-        static uint[,]? GetMatrix()
+        private static uint[,]? GetMatrix()
             => (uint[,])chBnds(new uint[,] { { 1, 2 }, { 3, 4 } }, new[] { 10, 10 });
 
-        static string Substract(this string value, string sub)
+        private static string Substract(this string value, string sub)
         {
             char old = '\0';
-            while (value.Contains(old)) ++old;
+            while (value.Contains(old))
+                ++old;
             int ind = 0;
-            var sb = new StringBuilder(value);
-            foreach (var chr in sub)
+            StringBuilder sb = new StringBuilder(value);
+            foreach (char chr in sub)
             {
                 ind = value.IndexOf(chr, ind);
-                if (ind == -1) return null!;
+                if (ind == -1)
+                    return null!;
                 sb[ind] = old;
             }
             return sb.Replace(old.ToString(), "").ToString();
         }
 
-        static int count(IEnumerable<int> seq)
+        private static int count(IEnumerable<int> seq)
         {
             int cmp(int l, int r) => l * r < 0 ? 1 : 0;
-            if (seq.Count() < 2) return 0;
+            if (seq.Count() < 2)
+                return 0;
             return cmp(seq.FirstOrDefault(), seq.ElementAt(1)) + count(seq.Skip(1));
         }
 
-        static int SumOfRangeTo(int x)
+        private static int SumOfRangeTo(int x)
         {
             int sum = x;
             while (x-- > 0)
@@ -417,10 +451,10 @@ namespace useless
             return sum;
         }
 
-        static readonly PropertyInfo debug =
+        private static readonly PropertyInfo debug =
             typeof(Expression).GetProperty("DebugView", (BindingFlags)(-1));
 
-        static void print(Expression expression)
+        private static void print(Expression expression)
             => Console.WriteLine(debug.GetValue(expression));
 
         /*
@@ -431,47 +465,43 @@ namespace useless
                 #  # #### #  # ####
          */
 
-        static string SortDist(this string str)
+        private static string SortDist(this string str)
         => string.Join("", str.OrderBy(x => x));
 
         public static StackTrace GetStackTrace(int n)
         {
-            if (n == 0) return new StackTrace();
+            if (n == 0)
+                return new StackTrace();
             return GetStackTrace(n - 1);
         }
 
-        static decimal StringToDecimal(string str)
+        private static decimal StringToDecimal(string str)
         {
-            var bytes = new BitArray(Encoding.UTF8.GetBytes(str));
-            var tmp = new int[4];
+            BitArray bytes = new BitArray(Encoding.UTF8.GetBytes(str));
+            int[] tmp = new int[4];
             bytes.CopyTo(tmp, 0);
             return new decimal(tmp);
         }
 
-        static string DecimalToString(decimal x)
+        private static string DecimalToString(decimal x)
         {
-            var bits = decimal.GetBits(x);
-            var arr = new BitArray(bits);
-            arr.Length = 3 * 4 * 8;
-            var res = new byte[3 * 4];
+            int[] bits = decimal.GetBits(x);
+            BitArray arr = new BitArray(bits)
+            {
+                Length = 3 * 4 * 8
+            };
+            byte[] res = new byte[3 * 4];
             arr.CopyTo(res, 0);
-            var str = Encoding.UTF8.GetString(res);
+            string str = Encoding.UTF8.GetString(res);
             return str;
         }
 
         static Program()
         {
-            return;
-            var dec = typeof(decimal);
-            dec.GetField("Zero").SetValue(null, StringToDecimal("Hello world!"));
-            dec.GetField("One").SetValue(null, StringToDecimal("Huli smotriw"));
-            dec.GetField("MinusOne").SetValue(null, StringToDecimal("BAXAX magic?"));
-            dec.GetField("MinValue").SetValue(null, StringToDecimal("BAXAX magic?"));
-            dec.GetField("MaxValue").SetValue(null, StringToDecimal("BAXAX magic?"));
         }
 
-        static BigInteger StrToBig(string str) => new BigInteger(Encoding.UTF8.GetBytes(str));
-        static string BigToStr(BigInteger big) => Encoding.Default.GetString(big.ToByteArray());
+        private static BigInteger StrToBig(string str) => new BigInteger(Encoding.UTF8.GetBytes(str));
+        private static string BigToStr(BigInteger big) => Encoding.Default.GetString(big.ToByteArray());
 
         public static void CalliTest()
         {
@@ -506,7 +536,8 @@ namespace useless
             myTypeBuilder.CreateType();
             myAsmBuilder.Save("mda.dll");
         }
-        static MethodInfo cw = ((Action<int>)Console.WriteLine).Method;
+
+        private static readonly MethodInfo cw = ((Action<int>)Console.WriteLine).Method;
         public static Action<int> Create(CallingConvention conv)
         {
             DynamicMethod dm = new DynamicMethod(
@@ -517,7 +548,7 @@ namespace useless
                 new Type[] { typeof(int) },
                 typeof(object),
                 false);
-            var il = dm.GetILGenerator();
+            ILGenerator il = dm.GetILGenerator();
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldftn, cw);
             il.EmitCalli(OpCodes.Calli,
@@ -528,17 +559,18 @@ namespace useless
             return (Action<int>)dm.CreateDelegate(typeof(Action<int>));
         }
 
-        static void AddDistinct(this List<char> list, char ch)
+        private static void AddDistinct(this List<char> list, char ch)
         {
-            if (!list.Contains(ch)) list.Add(ch);
+            if (!list.Contains(ch))
+                list.Add(ch);
         }
 
-        static string ExecMacro(string file)
+        private static string ExecMacro(string file)
         {
-            var lines = File.ReadAllLines(file);
-            var buf = new StringBuilder();
-            var macro = new Dictionary<string, string>();
-            foreach (var line in lines)
+            string[] lines = File.ReadAllLines(file);
+            StringBuilder buf = new StringBuilder();
+            Dictionary<string, string> macro = new Dictionary<string, string>();
+            foreach (string line in lines)
             {
                 if (line.StartsWith("#define "))
                 {
@@ -554,9 +586,9 @@ namespace useless
                 }
                 else
                 {
-                    foreach (var part in line.Split())
+                    foreach (string part in line.Split())
                     {
-                        buf.Append(macro.TryGetValue(part, out var val) ? val : part);
+                        buf.Append(macro.TryGetValue(part, out string val) ? val : part);
                     }
                 }
                 buf.AppendLine();
@@ -564,10 +596,12 @@ namespace useless
             return buf.ToString();
         }
 
-        static string GetNumFromOnes(int num)
+        private static string GetNumFromOnes(int num)
         {
-            if (num == 0) return "1 - 1";
-            if (num == 1) return "1";
+            if (num == 0)
+                return "1 - 1";
+            if (num == 1)
+                return "1";
             if (num < 0)
             {
                 if (num == int.MinValue)
@@ -590,8 +624,24 @@ namespace useless
         }
 
         [STAThread]
-        static void Main()
+        private static void Main()
         {
+            var p1 = new
+            {
+                X = 3,
+                Y = 4
+            };
+            var p2 = new { X = 5, Y = 7 };
+            for (int i = -999; i < 1000; i++)
+            {
+                Num num = Num.Create(i);
+                Console.ForegroundColor = (num.Value == i)
+                    ? ConsoleColor.Green
+                    : ConsoleColor.Red;
+                Console.WriteLine("{0,4} = {1,4} // {2}", i, num, num.GetType());
+            }
+            Console.ResetColor();
+
             (string, string)[] task1Data =
             {
                 (@"
@@ -634,7 +684,7 @@ BBBH", "ZCHB"),
 AAA
 ABC", "CAB")
             };
-            Console.WriteLine("Task1 passed: {0}", GraphTask.IsSolved(new Task1(), !true, task1Data));
+            Console.WriteLine("Task1 passed: {0}", TestingTask.IsSolved(new Task1(), !true, task1Data));
 
             (string, string)[] task3Data =
             {
@@ -665,14 +715,15 @@ ABC", "CAB")
                 (@"
 1
 1
-1", "5\n")
+1", "0\n")
             };
-            Console.WriteLine("Task3 passed: {0}", GraphTask.IsSolved(new Task3(), !true, task3Data));
+            Console.WriteLine("Task3 passed: {0}", TestingTask.IsSolved(new Task3.V1(), !true, task3Data));
+            Console.WriteLine("Task3 passed: {0}", TestingTask.IsSolved(new Task3.V2(), !true, task3Data));
 
             Console.ReadLine();
             return;
 
-            var lambda = BrainFuck.LambdaSource(@"+[>+]");
+            global::System.Linq.Expressions.Expression<global::System.Action> lambda = BrainFuck.LambdaSource(@"+[>+]");
             print(lambda);
             //var wtf = lambda.Compile();wtf();
             Application.EnableVisualStyles();
@@ -684,41 +735,46 @@ ABC", "CAB")
             //Console.ReadLine();
         }
 
-        static void write(params object[] array)
+        private static void write(params object[] array)
             => Console.Write(string.Concat(array));
 
-        static void writeln(params object[] array)
+        private static void writeln(params object[] array)
             => Console.WriteLine(string.Concat(array));
 
-        static string readlexem()
+        private static string readlexem()
         {
-            var buf = new StringBuilder();
+            StringBuilder buf = new StringBuilder();
             char x;
-            while (char.IsWhiteSpace(x = (char)Console.Read())) ;
+            while (char.IsWhiteSpace(x = (char)Console.Read()))
+                ;
             buf.Append(x);
             while (!char.IsWhiteSpace(x = (char)Console.Read()))
                 buf.Append(x);
             return buf.ToString();
         }
-        unsafe static void read_t<T>(in T a)
+
+        private static unsafe void read_t<T>(in T a)
             where T : unmanaged
         {
-            fixed (T* p = &a) *p = (T)Convert
-                    .ChangeType(readlexem(), typeof(T));
+            fixed (T* p = &a)
+            {
+                *p = (T)Convert
+      .ChangeType(readlexem(), typeof(T));
+            }
         }
-        static void read<A>(in A a)
-            where A : unmanaged
-        {
-            read_t(a);
-        }
-        static void read<A, B>(in A a, in B b)
+
+        private static void read<A>(in A a)
+            where A : unmanaged => read_t(a);
+
+        private static void read<A, B>(in A a, in B b)
             where A : unmanaged
             where B : unmanaged
         {
             read_t(a);
             read_t(b);
         }
-        static void read<A, B, C>(in A a, in B b, in C c)
+
+        private static void read<A, B, C>(in A a, in B b, in C c)
             where A : unmanaged
             where B : unmanaged
             where C : unmanaged
@@ -728,21 +784,22 @@ ABC", "CAB")
             read_t(c);
         }
 
-        class StringContainear
+        private class StringContainear
         {
-            string str;
-            List<int> list;
-            object locker;
-            int length, max;
-            public StringContainear(string str, List<int> list, object locker, int max = int.MaxValue)
-            {
-                (this.str, this.list, this.locker, this.max, length) = (str, list, locker, max, str.Length);
-            }
+            private readonly string str;
+            private readonly List<int> list;
+            private readonly object locker;
+            private readonly int length, max;
+            public StringContainear(string str, List<int> list, object locker, int max = int.MaxValue) => (this.str, this.list, this.locker, this.max, length) = (str, list, locker, max, str.Length);
             public void Invoke(int seed)
             {
                 Random random = new Random(seed);
                 for (int i = 0; i < length; i++)
-                    if (random.Next(max) != str[i]) return;
+                {
+                    if (random.Next(max) != str[i])
+                        return;
+                }
+
                 lock (locker)
                     list.Add(seed);
             }
@@ -752,18 +809,19 @@ ABC", "CAB")
         {
             List<int> list = new List<int>();
             object obj = new object();
-            var q = new StringContainear(str, list, obj);
-            var hndl = Parallel.For(0, int.MaxValue, q.Invoke);
-            while (!hndl.IsCompleted) Thread.Sleep(1000);
+            StringContainear q = new StringContainear(str, list, obj);
+            ParallelLoopResult hndl = Parallel.For(0, int.MaxValue, q.Invoke);
+            while (!hndl.IsCompleted)
+                Thread.Sleep(1000);
             return list.ToArray();
         }
 
-        static double[] convert(double value, double radix)
+        private static double[] convert(double value, double radix)
         {
             List<double> list = new List<double>();
             do
             {
-                var tmp = value % radix;
+                double tmp = value % radix;
                 list.Add(tmp);
                 value = (value - tmp) / radix;
             }
@@ -772,9 +830,9 @@ ABC", "CAB")
             return list.ToArray();
         }
 
-        static List<string> combine(string Str)
+        private static List<string> combine(string Str)
         {
-            var list = new List<string>();
+            List<string> list = new List<string>();
             for (int i = 0; i < Str.Length; i++)
                 combine(Str, i, "");
             return list;
@@ -793,8 +851,9 @@ ABC", "CAB")
                     combine(str, i, sum);
             }
         }
-        static int gray(int g) // Код Грея
-        { return g ^ g >> 1; }
+
+        private static int gray(int g) // Код Грея
+=> g ^ g >> 1;
         private static void waq(string[] args)
         {
             string strHostName = "";
@@ -822,16 +881,17 @@ ABC", "CAB")
                 Console.WriteLine("IP Address {0}: {1} ", i, addr[i].ToString());
             }
         }
-        static public string strrange(char v, int before, int after)
+        public static string strrange(char v, int before, int after)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             after += v;
             v -= (char)before;
             /*for (char x = v; x <= after; x++)
             {
                 sb.Append(x);
             }*/
-            while (v < after) sb.Append(v++);
+            while (v < after)
+                sb.Append(v++);
             return sb.ToString();
         }
     }

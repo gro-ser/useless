@@ -6,28 +6,38 @@ using static System.Linq.Expressions.Expression;
 
 namespace useless
 {
-    class BrainFuck
+    internal class BrainFuck
     {
-        enum OperationType { Undefined, Change, Shift, Loop, Output, Input }
-        static OperationType GetOperationType(char sym)
+        private enum OperationType { Undefined, Change, Shift, Loop, Output, Input }
+
+        private static OperationType GetOperationType(char sym)
         {
             switch (sym)
             {
-                case '+': case '-': return OperationType.Change;
-                case '<': case '>': return OperationType.Shift;
-                case '[': case ']': return OperationType.Loop;
-                case '.': return OperationType.Output;
-                case ',': return OperationType.Input;
-                default: return OperationType.Undefined;
+                case '+':
+                case '-':
+                    return OperationType.Change;
+                case '<':
+                case '>':
+                    return OperationType.Shift;
+                case '[':
+                case ']':
+                    return OperationType.Loop;
+                case '.':
+                    return OperationType.Output;
+                case ',':
+                    return OperationType.Input;
+                default:
+                    return OperationType.Undefined;
             }
         }
 
-        List<Expression> body;
-        Stack<List<Expression>> blocks;
-        ParameterExpression array, index, bytes;
-        ParameterExpression[] variables;
-        int elementCount;
-        bool printAtEnd;
+        private List<Expression> body;
+        private Stack<List<Expression>> blocks;
+        private readonly ParameterExpression array, index, bytes;
+        private readonly ParameterExpression[] variables;
+        private readonly int elementCount;
+        private readonly bool printAtEnd;
 
         public BrainFuck(int ElementCount, bool PrintAtEnd)
         {
@@ -52,7 +62,7 @@ namespace useless
             body = new List<Expression>();
             blocks.Push(body);
             Startup();
-            foreach (var x in source)
+            foreach (char x in source)
             {
                 type = GetOperationType(x);
                 if (type == OperationType.Undefined)
@@ -84,9 +94,12 @@ namespace useless
                 }
             }
             if (printAtEnd)
+            {
                 Add(Call(null, ((Action<string>)Console.WriteLine).Method,
                     Call(Constant(Encoding.UTF8), "GetString", null,
                         Call(bytes, "ToArray", null))));
+            }
+
             return Lambda<Action>(Block(variables, body));
         }
 
@@ -122,7 +135,7 @@ namespace useless
                 blocks.Push(new List<Expression>());
                 return;
             }
-            var list = blocks.Pop();
+            List<Expression> list = blocks.Pop();
             LabelTarget label = Label();
             Add(Loop(
                 IfThenElse(
@@ -140,13 +153,9 @@ namespace useless
             Convert(MakeMemberAccess(Call(((Func<ConsoleKeyInfo>)Console.ReadKey).Method),
                 typeof(ConsoleKeyInfo).GetProperty("Key")), typeof(byte));
 
-        private void Add(Expression expr)
-        {
-            blocks.Peek().Add(expr);
-        }
+        private void Add(Expression expr) => blocks.Peek().Add(expr);
 
-
-        static BrainFuck instance = new BrainFuck();
+        private static readonly BrainFuck instance = new BrainFuck();
 
         public static Action CompileSource(string source) =>
             instance.Compile(source);

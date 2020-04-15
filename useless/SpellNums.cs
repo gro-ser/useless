@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace useless
 {
-    class SpellNums
+    internal class SpellNums
     {
-        static string num = "0123456789ABCDEF";
-
-        StringBuilder str, tmp;
-        int radix, counter = 0;
+        private static readonly string num = "0123456789ABCDEF";
+        private StringBuilder str, tmp;
+        private readonly int radix;
+        private int counter = 0;
 
         public SpellNums(int radix, int start)
         {
-            if (radix > 16) throw
+            if (radix > 16)
+            {
+                throw
                 new Exception("radix must be less then 16");
+            }
+
             this.radix = radix;
             tmp = new StringBuilder().Append(num[start]);
             str = new StringBuilder();
@@ -24,7 +26,7 @@ namespace useless
         public SpellNums(int radix) : this(radix, 1) { }
         public SpellNums() : this(10, 1) { }
 
-        void addDigit(int x)
+        private void addDigit(int x)
         {
             if (x >= radix)
                 addDigit(x / radix);
@@ -36,7 +38,11 @@ namespace useless
             int length = str.Length, count = 0;
             char digit = length == 0 ? '\0' : str[0];
             for (int i = 0; i < length; i++)
-                if (str[i] == digit) ++count;
+            {
+                if (str[i] == digit)
+                {
+                    ++count;
+                }
                 else
                 {
                     addDigit(count);
@@ -44,6 +50,8 @@ namespace useless
                     count = 1;
                     digit = str[i];
                 }
+            }
+
             if (count != 0)
             {
                 addDigit(count);
@@ -62,7 +70,7 @@ namespace useless
         }
         public IEnumerable<string> StepSeq(int stepCount = 10)
         {
-            while (stepCount --> 0)
+            while (stepCount--> 0)
                 yield return Step();
         }
     }

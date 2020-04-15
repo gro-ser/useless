@@ -134,13 +134,13 @@
     <Compile Include="DataClasses\DataClassesCreator.cs" />
     <Compile Include="Enumeration\Calculator.cs" />
     <Compile Include="Enumeration\Enumeration.cs" />
-    <Compile Include="GraphTasks\GraphTask.cs" />
+    <Compile Include="TestingTasks\TestingTask.cs" />
     <Compile Include="GraphTasks\Task1.cs" />
     <Compile Include="GraphTasks\Task3.cs" />
     <Compile Include="HashTable\HashTable.cs" />
     <Compile Include="Huffman.cs" />
     <Compile Include="ImageFoker.cs" />
-    <Compile Include="MicroCalculator\Class1.cs" />
+    <Compile Include="MicroCalculator\MicroCalculator.cs" />
     <Compile Include="PSCalc.cs" />
     <Compile Include="RegexSolver.cs">
       <SubType>Form</SubType>
@@ -192,6 +192,7 @@
     <Compile Include="TabFormControl.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Traits\Num.cs" />
     <Compile Include="UserControl1.xaml.cs">
       <DependentUpon>UserControl1.xaml</DependentUpon>
     </Compile>

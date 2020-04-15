@@ -1,32 +1,32 @@
 ﻿using System;
 
-delegate TResult Curried<in T1, out TResult>(T1 arg);
+internal delegate TResult Curried<in T1, out TResult>(T1 arg);
 
-delegate Curried<T2, TR>
+internal delegate Curried<T2, TR>
     Curried<in T1, in T2, out TR>(T1 arg);
 
-delegate Curried<T2, T3, TR>
+internal delegate Curried<T2, T3, TR>
     Curried<in T1, in T2, in T3, out TR>(T1 arg);
 
-delegate Curried<T2, T3, T4, TR>
+internal delegate Curried<T2, T3, T4, TR>
     Curried<in T1, in T2, in T3, in T4, out TR>(T1 arg);
 
-delegate Curried<T2, T3, T4, T5, TR>
+internal delegate Curried<T2, T3, T4, T5, TR>
     Curried<in T1, in T2, in T3, in T4, in T5, out TR>(T1 arg);
 
-delegate Curried<T2, T3, T4, T5, T6, TR>
+internal delegate Curried<T2, T3, T4, T5, T6, TR>
     Curried<in T1, in T2, in T3, in T4, in T5, in T6, out TR>(T1 arg);
 
-delegate Curried<T2, T3, T4, T5, T6, T7, TR>
+internal delegate Curried<T2, T3, T4, T5, T6, T7, TR>
     Curried<in T1, in T2, in T3, in T4, in T5, in T6, in T7, out TR>(T1 arg);
 
-delegate Curried<T2, T3, T4, T5, T6, T7, T8, TR>
+internal delegate Curried<T2, T3, T4, T5, T6, T7, T8, TR>
     Curried<in T1, in T2, in T3, in T4, in T5, in T6, in T7, in T8, out TR>(T1 arg);
 
 public class Currying
 {
     // normalized method signature
-    static int[] CreateRange_normal
+    private static int[] CreateRange_normal
         (int start, int step, int count)
     {
         int[] result = new int[count];
@@ -36,7 +36,7 @@ public class Currying
     }
 
     // curried method using Func<>
-    static Func<int, Func<int, int[]>> CreateRange_func
+    private static Func<int, Func<int, int[]>> CreateRange_func
         (int start) => (int step) => (int count) =>
         {
             int[] result = new int[count];
@@ -46,7 +46,7 @@ public class Currying
         };
 
     // curried method using Curried<>
-    static Curried<int, int, int[]> CreateRange_curry
+    private static Curried<int, int, int[]> CreateRange_curry
         (int start) => (int step) => (int count) =>
         {
             int[] result = new int[count];
@@ -55,9 +55,9 @@ public class Currying
             return result;
         };
 
-    static void Print(int[] arr)
+    private static void Print(int[] arr)
     {
-        foreach (var x in arr)
+        foreach (int x in arr)
             Console.Write("{0} ", x);
         Console.WriteLine();
     }

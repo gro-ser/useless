@@ -7,8 +7,8 @@ using System.Text.RegularExpressions;
 
 public class PSCalc
 {
-    static readonly IEnumerable<string> members = typeof(Math).GetMembers().Select(mi => mi.Name);
-    static readonly Regex pattern = new Regex(string.Join("|", members), RegexOptions.IgnoreCase);
+    private static readonly IEnumerable<string> members = typeof(Math).GetMembers().Select(mi => mi.Name);
+    private static readonly Regex pattern = new Regex(string.Join("|", members), RegexOptions.IgnoreCase);
 
     public static double[] Execute(string fun, params double[] values)
     {
@@ -17,10 +17,10 @@ public class PSCalc
         // 'x' is a parameter
         fun = fun.Replace("x", "$_");
         // delimeter is dot, not comma
-        var nfi = new NumberFormatInfo
+        NumberFormatInfo nfi = new NumberFormatInfo
         { NumberDecimalSeparator = "." };
         // all values to string array such "1,2,3.4"
-        var array = string.Join(",", values.Select(x => x.ToString(nfi)));
+        string array = string.Join(",", values.Select(x => x.ToString(nfi)));
         // <values> | % { <function body> }
         fun = $"{array} | % {{ {fun} }}";
         Process ps = new Process
@@ -37,11 +37,12 @@ public class PSCalc
             }
         };
         ps.Start();
-        var output = ps.StandardOutput.ReadToEnd();
+        string output = ps.StandardOutput.ReadToEnd();
         // each line is one result
-        var results = output.Split(new[] { "\r\n" }, StringSplitOptions.None);
+        string[] results = output.Split(new[] { "\r\n" }, StringSplitOptions.None);
         // pass one empty line at end [1]
         if (results.Length - 1 == values.Length)
+        {
             try
             {
                 // pass one empty line at end [2]
@@ -50,6 +51,8 @@ public class PSCalc
                     .Select(double.Parse).ToArray();
             }
             catch { }
+        }
+
         return null;
     }
 }

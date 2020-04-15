@@ -12,7 +12,7 @@ namespace useless
 {
     public partial class RegexSolver : Form
     {
-        class Settings
+        private class Settings
         {
             public string CharRange { get; set; }
                 = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\";
@@ -25,9 +25,9 @@ namespace useless
             public RegexOptions RegexOptions { get; set; } = RegexOptions.IgnoreCase;
         }
 
-        int width, height, col, row;
-        Regex[] top, bottom, left, right;
-        readonly Settings settings = new Settings();
+        private int width, height, col, row;
+        private Regex[] top, bottom, left, right;
+        private readonly Settings settings = new Settings();
 
         public RegexSolver()
         {
@@ -35,10 +35,7 @@ namespace useless
             propertyGrid1.SelectedObject = settings;
         }
 
-        private void Button2_Click(object sender, EventArgs e)
-        {
-            ClearGrid();
-        }
+        private void Button2_Click(object sender, EventArgs e) => ClearGrid();
 
         private void Button1_Click(object sender, EventArgs e)
         {
@@ -63,11 +60,13 @@ namespace useless
             //dgv.Rows[0].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
             for (int x = 0; x < width + 2; x += width + 1)
+            {
                 for (int y = 0; y < height + 2; y += height + 1)
                 {
                     dgv[x, y].Style.BackColor = Color.Silver;
                     dgv[x, y].ReadOnly = true;
                 }
+            }
 
             //for (int x = 1; x <= width; ++x)
             //    for (int y = 1; y <= height; ++y)
@@ -79,10 +78,7 @@ namespace useless
                 col.SortMode = DataGridViewColumnSortMode.NotSortable;
         }
 
-        private void Button3_Click(object sender, EventArgs e)
-        {
-            Setup();
-        }
+        private void Button3_Click(object sender, EventArgs e) => Setup();
 
         private void Setup()
         {
@@ -113,24 +109,17 @@ namespace useless
         private void ClearGrid()
         {
             for (int x = 1; x <= width; ++x)
+            {
                 for (int y = 1; y <= height; ++y)
                     dgv[x, y].Value = null;
+            }
         }
 
-        private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            settings.CharRange = settings.ShortCharRange;
-        }
+        private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) => settings.CharRange = settings.ShortCharRange;
 
-        private void LinkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            settings.CharRange = settings.DefaultCharRange;
-        }
+        private void LinkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) => settings.CharRange = settings.DefaultCharRange;
 
-        private void LinkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            settings.CharRange = settings.FullCharRange;
-        }
+        private void LinkLabel3_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) => settings.CharRange = settings.FullCharRange;
 
         private void Dgv_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -142,16 +131,19 @@ namespace useless
         {
             UseWaitCursor = true;
 
-            if (col == 0 || col > width) return;
+            if (col == 0 || col > width)
+                return;
 
-            var sources = new string[height];
+            string[] sources = new string[height];
             for (int i = 1; i <= height; i++)
                 sources[i - 1] = dgv[col, i].FormattedValue.ToString();
 
-            var res = SafeGetStringsByRegex(height, sources, new[] { top[col], bottom[col] });
+            string[] res = SafeGetStringsByRegex(height, sources, new[] { top[col], bottom[col] });
             if (res != null)
+            {
                 for (int i = 1; i <= height; i++)
                     dgv[col, i].Value = res[i - 1];
+            }
 
             UseWaitCursor = !true;
         }
@@ -167,41 +159,42 @@ namespace useless
         {
             UseWaitCursor = true;
 
-            if (row == 0 || row > height) return;
+            if (row == 0 || row > height)
+                return;
 
-            var sources = new string[width];
+            string[] sources = new string[width];
             for (int i = 1; i <= width; i++)
                 sources[i - 1] = dgv[i, row].FormattedValue.ToString();
 
-            var res = SafeGetStringsByRegex(width, sources, new[] { left[row], right[row] });
+            string[] res = SafeGetStringsByRegex(width, sources, new[] { left[row], right[row] });
             if (res != null)
+            {
                 for (int i = 1; i <= width; i++)
                     dgv[i, row].Value = res[i - 1];
+            }
 
             UseWaitCursor = !true;
         }
 
-        private void Button4_Click(object sender, EventArgs e)
-        {
-            propertyGrid1.SelectedObject = dgv;
-        }
+        private void Button4_Click(object sender, EventArgs e) => propertyGrid1.SelectedObject = dgv;
 
-        private void Button4_Click_1(object sender, EventArgs e)
-        {
-            AutoFind();
-        }
+        private void Button4_Click_1(object sender, EventArgs e) => AutoFind();
 
         private void AutoFind()
         {
-            if (top == null) Setup();
+            if (top == null)
+                Setup();
             int repeats = 0;
             (col, row) = (1, 1);
-            if (height > width) col = width + 1;
+            if (height > width)
+                col = width + 1;
             Save();
             while (!IsEnded())
             {
                 if (col > width)
+                {
                     if (row > height)
+                    {
                         if (IsFailed())
                         {
                             MessageBox.Show("IT IS FAIL!");
@@ -213,28 +206,32 @@ namespace useless
                             return;
                         }
                         else
+                        {
                             (col, row, repeats) = (1, 1, repeats + 1);
-                    else UpdateByRow(row++);
-                else UpdateByColumn(col++);
+                        }
+                    }
+                    else
+                        UpdateByRow(row++);
+                }
+                else
+                    UpdateByColumn(col++);
                 Refresh();
             }
             MessageBox.Show("DONE!");
         }
 
-        private void Button5_Click(object sender, EventArgs e)
-        {
-            Save();
-        }
+        private void Button5_Click(object sender, EventArgs e) => Save();
 
         private void Save()
         {
-            using var sw = new StreamWriter("temp.csv");
+            using StreamWriter sw = new StreamWriter("temp.csv");
             for (int i = 0; i < dgv.RowCount; i++)
             {
                 for (int j = 0; j < dgv.ColumnCount; j++)
                 {
-                    var str = dgv[j, i].FormattedValue.ToString();
-                    if (str.Contains(';')) str = @$"""{str}""";
+                    string str = dgv[j, i].FormattedValue.ToString();
+                    if (str.Contains(';'))
+                        str = @$"""{str}""";
                     sw.Write(str);
                     if (j < dgv.ColumnCount - 1)
                         sw.Write(";\0");
@@ -243,18 +240,16 @@ namespace useless
             }
         }
 
-        private void Button6_Click(object sender, EventArgs e)
-        {
-            Apply();
-        }
+        private void Button6_Click(object sender, EventArgs e) => Apply();
 
         private void Apply()
         {
-            using var sr = new StreamReader("temp.csv");
+            using StreamReader sr = new StreamReader("temp.csv");
             for (int i = 0; i <= height + 1; i++)
             {
-                var tmp = sr.ReadLine()?.Split(new[] { ";\0" }, StringSplitOptions.None);
-                if (tmp == null) return;
+                string[] tmp = sr.ReadLine()?.Split(new[] { ";\0" }, StringSplitOptions.None);
+                if (tmp == null)
+                    return;
                 for (int j = 0; j <= width + 1; j++)
                 {
                     if (j < tmp.Length)
@@ -263,12 +258,9 @@ namespace useless
             }
         }
 
-        private void CheckBox2_CheckedChanged(object sender, EventArgs e)
-        {
-            settings.RegexOptions = checkBox2.Checked ?
+        private void CheckBox2_CheckedChanged(object sender, EventArgs e) => settings.RegexOptions = checkBox2.Checked ?
                 settings.RegexOptions | RegexOptions.IgnoreCase :
                 settings.RegexOptions & ~RegexOptions.IgnoreCase;
-        }
 
         private void BSetRange_Click(object sender, EventArgs e)
         {
@@ -281,10 +273,12 @@ namespace useless
         {
             try
             {
-                if (chr == null) throw new Exception("chr is null!");
-                if(chr.Length>2&&chr[0]==('\\'))
+                if (chr == null)
+                    throw new Exception("chr is null!");
+                if (chr.Length>2&&chr[0]==('\\'))
                     chr = Regex.Unescape(chr);
-                if (chr.Length == 1) return chr[0];
+                if (chr.Length == 1)
+                    return chr[0];
                 return (char)(int.Parse(chr) + start);
             }
             catch (Exception e)
@@ -296,7 +290,7 @@ namespace useless
 
         private void Label2_DoubleClick(object sender, EventArgs e)
         {
-            var tmp = textBox1.Text;
+            string tmp = textBox1.Text;
             textBox1.Text = textBox2.Text;
             textBox2.Text = tmp;
         }
@@ -308,16 +302,13 @@ namespace useless
             AutoFind();
         }
 
-        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            dgv.AutoSizeColumnsMode = checkBox1.Checked ?
+        private void CheckBox1_CheckedChanged(object sender, EventArgs e) => dgv.AutoSizeColumnsMode = checkBox1.Checked ?
                 DataGridViewAutoSizeColumnsMode.ColumnHeader :
                 DataGridViewAutoSizeColumnsMode.AllCells;
-        }
 
         private void TextBoxEnter(object sender, EventArgs e)
         {
-            var tb = (sender as TextBox);
+            TextBox tb = (sender as TextBox);
             if (tb.SelectionStart == tb.TextLength)
                 tb.SelectAll();
         }
@@ -325,18 +316,28 @@ namespace useless
         private bool IsEnded()
         {
             for (int x = 1; x <= width; ++x)
+            {
                 for (int y = 1; y <= height; ++y)
+                {
                     if (dgv[x, y].FormattedValue.ToString().Length != 1)
                         return false;
+                }
+            }
+
             return true;
         }
 
         private bool IsFailed()
         {
             for (int x = 1; x <= width; ++x)
+            {
                 for (int y = 1; y <= height; ++y)
+                {
                     if (!string.IsNullOrEmpty(dgv[x, y].FormattedValue.ToString()))
                         return false;
+                }
+            }
+
             return true;
         }
 
@@ -349,24 +350,28 @@ namespace useless
             if (sources.Length != length)
                 throw new Exception("Length != length");
             for (int i = 0; i < length; i++)
+            {
                 if (string.IsNullOrEmpty(sources[i]))
                     sources[i] = settings.CharRange;
+            }
 
-            var results = new List<char>[length];
+            List<char>[] results = new List<char>[length];
 
             for (int i = 0; i < length; i++)
                 results[i] = new List<char>();
 
-            var sb = new StringBuilder(length);
+            StringBuilder sb = new StringBuilder(length);
             for (int i = 0; i < length; i++)
                 sb.Append(sources[i][0]);
 
             while (true)
             {
-                var str = sb.ToString();
+                string str = sb.ToString();
                 if (regexes.All(r => r.IsMatch(str)))
+                {
                     for (int i = 0; i < length; i++)
                         results[i].AddDistinct(str[i]);
+                }
 
                 bool lastOfRange = true;
 
@@ -375,14 +380,16 @@ namespace useless
                     int ind = sources[i].IndexOf(sb[i]) + 1;
                     if (ind < sources[i].Length)
                         lastOfRange = false;
-                    else ind = 0;
+                    else
+                        ind = 0;
                     sb[i] = sources[i][ind];
                 }
 
-                if (lastOfRange) break;
+                if (lastOfRange)
+                    break;
             }
 
-            var tmp = new string[length];
+            string[] tmp = new string[length];
             for (int i = 0; i < length; i++)
                 tmp[i] = string.Concat(results[i]);
 
@@ -394,18 +401,22 @@ namespace useless
         {
             string[] result = null;
             var container = new { result = null as string[] };
-            
-            var thread = new Thread(obj =>
+
+            Thread thread = new Thread(obj =>
             {
-                var (length, sources, regexes) =
+                (int length, string[] sources, Regex[] regexes) =
                     ((int, string[], Regex[]))obj;
                 result = GetStringsByRegex(length, sources, regexes);
-            });            
+            });
             thread.Start((length, sources, regexes));
             for (int i = settings.TimeOut / 100; i > 0; --i)
+            {
                 if (thread.IsAlive)
                     Thread.Sleep(100);
-                else return result;
+                else
+                    return result;
+            }
+
             thread.Abort();
             return null;
         }

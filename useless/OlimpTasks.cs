@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static System.Math;
 
 namespace useless
@@ -11,19 +8,20 @@ namespace useless
     public class OlimpTasks
     {
         public const float deg = (float)(180 / PI);
-        static float Angle(float dx, float dy) => (float)Atan2(dy, dx) * deg;
-        static float Sqr(float a) => a * a;
-        static float Abs(float x, float y) => (float)Sqrt(Sqr(x) + Sqr(y));
+
+        private static float Angle(float dx, float dy) => (float)Atan2(dy, dx) * deg;
+        private static float Sqr(float a) => a * a;
+        private static float Abs(float x, float y) => (float)Sqrt(Sqr(x) + Sqr(y));
         public static (float[], float[]) GetFactorsAndScales(float x, float y, (float x, float y)[] points)
         {
             int len = points.Length;
             float[] scales = new float[len], angles = new float[len];
             float angle = 90;
-            var max = points.Max(p => Abs(x - p.x, y - p.y));
+            float max = points.Max(p => Abs(x - p.x, y - p.y));
             for (int i = 0; i < len; i++)
             {
-                var p = points[i];
-                var ang = Angle(p.x - x, p.y - y);
+                (float x, float y) p = points[i];
+                float ang = Angle(p.x - x, p.y - y);
                 angles[i] = ang - angle;
                 angle = ang;
                 scales[i] = Abs(p.x - x, p.y - y) / max;
@@ -34,14 +32,16 @@ namespace useless
             => GetFactorsAndScales(args.Item1, args.Item2, args.Item3);
         public static (float[], float[]) GetFactorsAndScales((float x, float y)[] points)
             => GetFactorsAndScales(points.Average(p => p.x), points.Average(p => p.y), points);
-        static (float, float)[]
+
+        private static readonly (float, float)[]
             Square = (new (float, float)[] { (0, 2), (2, 2), (2, 0), (0, 0) }),
             Square2 = (new (float, float)[] { (0, 2), (1, 2), (2, 2), (2, 1), (2, 0), (1, 0), (0, 0), (0, 1) });
 
-        static void Println<type>(type[] arr, Func<type, string> str = null)
+        private static void Println<type>(type[] arr, Func<type, string> str = null)
         {
-            if (str == null) str = v => v.ToString();
-            var length = arr.Length;
+            if (str == null)
+                str = v => v.ToString();
+            int length = arr.Length;
             Console.Write("{");
             if (length > 0)
                 Console.Write("{0}", str(arr[0]));
@@ -49,13 +49,15 @@ namespace useless
                 Console.Write(", {0}", str(arr[i]));
             Console.WriteLine("}");
         }
-        static void Println<type>((type[], type[]) args, Func<type, string> str = null)
+
+        private static void Println<type>((type[], type[]) args, Func<type, string> str = null)
         {
-            Println(args.Item1, str); Println(args.Item2, str);
+            Println(args.Item1, str);
+            Println(args.Item2, str);
             Console.WriteLine();
         }
 
-        static (float, float, (float, float)[])
+        private static (float, float, (float, float)[])
             square = (1, 1, new (float, float)[] { (0, 2), (2, 2), (2, 0), (0, 0) }),
             square2 = (1, 1, new (float, float)[] { (0, 2), (1, 2), (2, 2), (2, 1), (2, 0), (1, 0), (0, 0), (0, 1) }),
             triangle = (0, 0, new (float, float)[] { (0, 1), (0.866f, -0.5f), (-0.866f, -0.5f) }),

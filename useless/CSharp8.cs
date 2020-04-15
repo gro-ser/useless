@@ -4,12 +4,13 @@ using System.Numerics;
 
 namespace useless
 {
-    class nums
+    internal class nums
     {
-        static BigInteger[] primes = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37 };
+        private static readonly BigInteger[] primes = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37 };
         public static BigInteger exp_ez(BigInteger x, BigInteger y)
         {
-            if (x == 0) return -1;
+            if (x == 0)
+                return -1;
             BigInteger pow = 0;
             while (x % y == 0)
             {
@@ -22,17 +23,20 @@ namespace useless
         public static BigInteger exp_my(BigInteger x, BigInteger y)
         {
             const int len = 7;
-            if (x == 0) return -1;
+            if (x == 0)
+                return -1;
             BigInteger[] pows = new BigInteger[len];
             int ipow = 0;
             pows[0] = y;
             for (int i = 1; i < len; ++i)
             {
-                var lst = pows[i - 1];
-                var tmp = lst * lst;
+                BigInteger lst = pows[i - 1];
+                BigInteger tmp = lst * lst;
                 tmp = tmp * tmp;
-                if (tmp > x) break;
-                ++ipow; pows[i] = tmp;
+                if (tmp > x)
+                    break;
+                ++ipow;
+                pows[i] = tmp;
             }
             BigInteger pow = 0, div;
             do
@@ -43,7 +47,10 @@ namespace useless
                     pow += 1 << (ipow << 1);
                     x /= div;
                 }
-                else --ipow;
+                else
+                {
+                    --ipow;
+                }
             }
             while (ipow >= 0);
             return pow;
@@ -52,7 +59,7 @@ namespace useless
         public static void MainTest()
         {
             const int length = 500_000;
-            var sw = new Stopwatch();
+            Stopwatch sw = new Stopwatch();
 
             expTest(length, sw, (BigInteger)Math.Pow(2 * 3, 2), "small");
             expTest(length, sw, (BigInteger)Math.Pow(2 * 3, 8), "medium");

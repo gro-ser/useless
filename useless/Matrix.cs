@@ -3,10 +3,12 @@ using useless;
 
 public class Matrix<T>
 {
-    static VeryMath<T> op = VeryMath<T>.GetDefault();
-    static void SetVeryMath(VeryMath<T> @new)
+    private static VeryMath<T> op = VeryMath<T>.GetDefault();
+
+    private static void SetVeryMath(VeryMath<T> @new)
     {
-        if (@new != null) op = @new;
+        if (@new != null)
+            op = @new;
     }
 
     protected T[,] matrix;
@@ -23,18 +25,20 @@ public class Matrix<T>
     public Matrix(int N, int M)
     {
         matrix = new T[N, M];
-        n_ = N; m_ = M;
+        n_ = N;
+        m_ = M;
     }
     protected Matrix(int N, int M, T[,] matrix)
     {
-        n_ = N; m_ = M;
+        n_ = N;
+        m_ = M;
         this.matrix = matrix;
     }
 
     public T this[int x, int y]
     {
-        get { return matrix[x, y]; }
-        set { matrix[x, y] = value; }
+        get => matrix[x, y];
+        set => matrix[x, y] = value;
     }
 
     public bool Square => n_ == m_;
@@ -42,27 +46,36 @@ public class Matrix<T>
 
     public static Matrix<T> operator +(Matrix<T> a, Matrix<T> b)
     {
-        if (!Like(a, b)) throw new Exception();
+        if (!Like(a, b))
+            throw new Exception();
         int n = a.n_, m = a.m_;
-        var tmp = new T[n, m];
+        T[,] tmp = new T[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = op.sum(a.matrix[x, y], b.matrix[x, y]);
+        }
+
         return new Matrix<T>(n, m, tmp);
     }
     public static Matrix<T> operator -(Matrix<T> a, Matrix<T> b)
     {
-        if (!Like(a, b)) throw new Exception();
+        if (!Like(a, b))
+            throw new Exception();
         int n = a.n_, m = a.m_;
-        var tmp = new T[n, m];
+        T[,] tmp = new T[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = op.sub(a.matrix[x, y], b.matrix[x, y]);
+        }
+
         return new Matrix<T>(n, m, tmp);
     }
     public static Matrix<T> operator *(Matrix<T> a, Matrix<T> b)
     {
-        if (a.m_ != b.n_) throw new Exception();
+        if (a.m_ != b.n_)
+            throw new Exception();
         T[,] tmp = new T[a.n_, b.m_];
         T sum;
         for (int x = a.n_ - 1; x >= 0; --x)
@@ -80,31 +93,39 @@ public class Matrix<T>
     public static Matrix<T> operator *(Matrix<T> a, T v)
     {
         int n = a.n_, m = a.m_;
-        var tmp = new T[n, m];
+        T[,] tmp = new T[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = op.mul(a.matrix[x, y], v);
+        }
+
         return new Matrix<T>(n, m, tmp);
     }
     public static Matrix<T> operator /(Matrix<T> a, T v)
     {
         int n = a.n_, m = a.m_;
-        var tmp = new T[n, m];
+        T[,] tmp = new T[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = op.div(a.matrix[x, y], v);
+        }
+
         return new Matrix<T>(n, m, tmp);
     }
 
     public Matrix<T> AddMinor(int cutX, int cutY)
     {
-        var tmp = new T[n_ - 1, m_ - 1];
+        T[,] tmp = new T[n_ - 1, m_ - 1];
         for (int x = 0, xx = 0; xx < n_ - 1; x++, xx++)
         {
-            if (x == cutX) x++;
+            if (x == cutX)
+                x++;
             for (int y = 0, yy = 0; yy < m_ - 1; y++, yy++)
             {
-                if (y == cutY) y++;
+                if (y == cutY)
+                    y++;
                 tmp[xx, yy] = matrix[x, y];
             }
         }
@@ -114,14 +135,20 @@ public class Matrix<T>
     public T Addition(int x, int y) => op.mul(Minor(x, y), op.convert((((x + y + 1) & 1) * 2 - 1)));
     public T Determinant()
     {
-        if (n_ != m_ || n_ <= 0) throw new Exception();
-        if (n_ == 1) return matrix[0, 0];
-        if (n_ == 2) return op.sub(op.mul(matrix[0, 0], matrix[1, 1]), op.mul(matrix[0, 1], matrix[1, 0]));
+        if (n_ != m_ || n_ <= 0)
+            throw new Exception();
+        if (n_ == 1)
+            return matrix[0, 0];
+        if (n_ == 2)
+            return op.sub(op.mul(matrix[0, 0], matrix[1, 1]), op.mul(matrix[0, 1], matrix[1, 0]));
         if (n_ == 3)
+        {
             return op.sum(op.sum(
             op.sub(op.mul(op.mul(matrix[0, 0], matrix[1, 1]), matrix[2, 2]), op.mul(op.mul(matrix[0, 0], matrix[1, 2]), matrix[2, 1])),
             op.sub(op.mul(op.mul(matrix[0, 1], matrix[1, 2]), matrix[2, 0]), op.mul(op.mul(matrix[0, 1], matrix[1, 0]), matrix[2, 2]))),
             op.sub(op.mul(op.mul(matrix[0, 2], matrix[1, 0]), matrix[2, 1]), op.mul(op.mul(matrix[0, 2], matrix[1, 1]), matrix[2, 0])));
+        }
+
         T ans = op.zero;
         for (int x = 0, i = 1; x < n_; x++, i = -i)
             ans = op.sum(op.mul(op.convert(i), op.mul(matrix[x, 0], Minor(x, 0))), ans);
@@ -131,8 +158,11 @@ public class Matrix<T>
     {
         T[,] tmp = new T[m_, n_];
         for (int x = 0; x < n_; x++)
+        {
             for (int y = 0; y < m_; y++)
                 tmp[y, x] = matrix[x, y];
+        }
+
         return new Matrix<T>(m_, n_, tmp);
 
     }
@@ -140,18 +170,20 @@ public class Matrix<T>
     {
         T[,] tmp = new T[n_, m_];
         for (int x = 0; x < n_; x++)
+        {
             for (int y = 0; y < m_; y++)
                 tmp[x, y] = Addition(x, y);
+        }
+
         return new Matrix<T>(n_, m_, tmp);
     }
-    public Matrix<T> Invert()
-    {
-        return Adjugate().Transparent() / Determinant();
-    }
+    public Matrix<T> Invert() => Adjugate().Transparent() / Determinant();
     public T Permanent_()
     {
-        if (n_ == 1) return matrix[0, 0];
-        if (n_ == 2) return op.sum(op.mul(matrix[0, 0], matrix[1, 1]), op.mul(matrix[0, 1], matrix[1, 0]));
+        if (n_ == 1)
+            return matrix[0, 0];
+        if (n_ == 2)
+            return op.sum(op.mul(matrix[0, 0], matrix[1, 1]), op.mul(matrix[0, 1], matrix[1, 0]));
 
         T ans = op.zero;
         for (int x = 0; x < n_; x++)
@@ -160,14 +192,15 @@ public class Matrix<T>
     }
     public T Permanent()
     {
-        if (!Square) throw new Exception();
+        if (!Square)
+            throw new Exception();
         return Permanent_();
     }
 
     public static Matrix<T> Horizontal(T[] v)
     {
         int m = v.Length;
-        var tmp = new T[1, m];
+        T[,] tmp = new T[1, m];
         for (int i = 0; i < m; i++)
             tmp[0, i] = v[i];
         return new Matrix<T>(1, m, tmp);
@@ -175,7 +208,7 @@ public class Matrix<T>
     public static Matrix<T> Vertical(T[] v)
     {
         int n = v.Length;
-        var tmp = new T[n, 1];
+        T[,] tmp = new T[n, 1];
         for (int i = 0; i < n; i++)
             tmp[i, 0] = v[i];
         return new Matrix<T>(n, 1, tmp);
@@ -196,34 +229,43 @@ public class Matrix
 
     public object Clone() => new Matrix(this);
 
-    public double this[int x, int y] { get { return matrix[x, y]; } set { matrix[x, y] = value; } }
+    public double this[int x, int y] { get => matrix[x, y]; set => matrix[x, y] = value; }
 
     public bool Square => n_ == m_;
     public static bool Like(Matrix a, Matrix b) => a.n_ == b.n_ && a.m_ == b.m_;
 
     public static Matrix operator +(Matrix a, Matrix b)
     {
-        if (!Like(a, b)) throw new Exception();
+        if (!Like(a, b))
+            throw new Exception();
         int n = a.n_, m = a.m_;
-        var tmp = new double[n, m];
+        double[,] tmp = new double[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = a.matrix[x, y] + b.matrix[x, y];
+        }
+
         return new Matrix(n, m, tmp);
     }
     public static Matrix operator -(Matrix a, Matrix b)
     {
-        if (!Like(a, b)) throw new Exception();
+        if (!Like(a, b))
+            throw new Exception();
         int n = a.n_, m = a.m_;
-        var tmp = new double[n, m];
+        double[,] tmp = new double[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = a.matrix[x, y] - b.matrix[x, y];
+        }
+
         return new Matrix(n, m, tmp);
     }
     public static Matrix operator *(Matrix a, Matrix b)
     {
-        if (a.m_ != b.n_) throw new Exception();
+        if (a.m_ != b.n_)
+            throw new Exception();
         double[,] tmp = new double[a.n_, b.m_];
         double sum;
         for (int x = a.n_ - 1; x >= 0; --x)
@@ -243,31 +285,39 @@ public class Matrix
     public static Matrix operator *(Matrix a, double v)
     {
         int n = a.n_, m = a.m_;
-        var tmp = new double[n, m];
+        double[,] tmp = new double[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = a.matrix[x, y] * v;
+        }
+
         return new Matrix(n, m, tmp);
     }
     public static Matrix operator /(Matrix a, double v)
     {
         int n = a.n_, m = a.m_;
-        var tmp = new double[n, m];
+        double[,] tmp = new double[n, m];
         for (int x = 0; x < n; x++)
+        {
             for (int y = 0; y < m; y++)
                 tmp[x, y] = a.matrix[x, y] / v;
+        }
+
         return new Matrix(n, m, tmp);
     }
 
     public Matrix AddMinor(int cutX, int cutY)
     {
-        var tmp = new double[n_ - 1, m_ - 1];
+        double[,] tmp = new double[n_ - 1, m_ - 1];
         for (int x = 0, xx = 0; xx < n_ - 1; x++, xx++)
         {
-            if (x == cutX) x++;
+            if (x == cutX)
+                x++;
             for (int y = 0, yy = 0; yy < m_ - 1; y++, yy++)
             {
-                if (y == cutY) y++;
+                if (y == cutY)
+                    y++;
                 tmp[xx, yy] = matrix[x, y];
             }
         }
@@ -277,14 +327,20 @@ public class Matrix
     public double Addition(int x, int y) => Minor(x, y) * (((x + y + 1) & 1) * 2 - 1);
     public double Determinant()
     {
-        if (n_ != m_ || n_ <= 0) throw new Exception();
-        if (n_ == 1) return matrix[0, 0];
-        if (n_ == 2) return matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0];
+        if (n_ != m_ || n_ <= 0)
+            throw new Exception();
+        if (n_ == 1)
+            return matrix[0, 0];
+        if (n_ == 2)
+            return matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0];
         if (n_ == 3)
+        {
             return
             matrix[0, 0] * matrix[1, 1] * matrix[2, 2] - matrix[0, 0] * matrix[1, 2] * matrix[2, 1] +
             matrix[0, 1] * matrix[1, 2] * matrix[2, 0] - matrix[0, 1] * matrix[1, 0] * matrix[2, 2] +
             matrix[0, 2] * matrix[1, 0] * matrix[2, 1] - matrix[0, 2] * matrix[1, 1] * matrix[2, 0];
+        }
+
         double ans = 0;
         for (int x = 0, i = 1; x < n_; x++, i = -i)
             ans += i * matrix[x, 0] * Minor(x, 0);
@@ -294,8 +350,11 @@ public class Matrix
     {
         double[,] tmp = new double[m_, n_];
         for (int x = 0; x < n_; x++)
+        {
             for (int y = 0; y < m_; y++)
                 tmp[y, x] = matrix[x, y];
+        }
+
         return new Matrix(m_, n_, tmp);
 
     }
@@ -303,18 +362,20 @@ public class Matrix
     {
         double[,] tmp = new double[n_, m_];
         for (int x = 0; x < n_; x++)
+        {
             for (int y = 0; y < m_; y++)
                 tmp[x, y] = Addition(x, y);
+        }
+
         return new Matrix(n_, m_, tmp);
     }
-    public Matrix Invert()
-    {
-        return Adjugate().Transparent() / Determinant();
-    }
+    public Matrix Invert() => Adjugate().Transparent() / Determinant();
     public double Permanent_()
     {
-        if (n_ == 1) return matrix[0, 0];
-        if (n_ == 2) return matrix[0, 0] * matrix[1, 1] + matrix[0, 1] * matrix[1, 0];
+        if (n_ == 1)
+            return matrix[0, 0];
+        if (n_ == 2)
+            return matrix[0, 0] * matrix[1, 1] + matrix[0, 1] * matrix[1, 0];
 
         double ans = 0;
         for (int x = 0; x < n_; x++)
@@ -323,14 +384,15 @@ public class Matrix
     }
     public double Permanent()
     {
-        if (!Square) throw new Exception();
+        if (!Square)
+            throw new Exception();
         return Permanent_();
     }
 
     public static Matrix Horizontal(double[] v)
     {
         int m = v.Length;
-        var tmp = new double[1, m];
+        double[,] tmp = new double[1, m];
         for (int i = 0; i < m; i++)
             tmp[0, i] = v[i];
         return new Matrix(1, m, tmp);
@@ -338,7 +400,7 @@ public class Matrix
     public static Matrix Vertical(double[] v)
     {
         int n = v.Length;
-        var tmp = new double[n, 1];
+        double[,] tmp = new double[n, 1];
         for (int i = 0; i < n; i++)
             tmp[i, 0] = v[i];
         return new Matrix(n, 1, tmp);

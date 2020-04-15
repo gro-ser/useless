@@ -1,33 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace useless.Enumeration
 {
-    abstract public class Enumeration<T>
+    public abstract class Enumeration<T>
     {
         protected T value;
         public static T GetRawValue(Enumeration<T> enumeration) => enumeration.value;
 
-        static Dictionary<Type, Dictionary<T, string>> values = new Dictionary<Type, Dictionary<T, string>>();
+        private static readonly Dictionary<Type, Dictionary<T, string>> values = new Dictionary<Type, Dictionary<T, string>>();
 
         protected Enumeration()
         {
-            var type = GetType();
+            Type type = GetType();
             if (!values.ContainsKey(type))
             {
                 T value = default;
-                var dict = new Dictionary<T, string>();
+                Dictionary<T, string> dict = new Dictionary<T, string>();
                 values[type] = dict;
-                foreach (var prop in type.GetFields(BindingFlags.Public | BindingFlags.Static))
+                foreach (FieldInfo prop in type.GetFields(BindingFlags.Public | BindingFlags.Static))
                 {
                     if (prop.FieldType != type)
                         continue;
-                    var sv = prop.GetCustomAttribute<StartValueAttribute>();
-                    var some = prop.GetValue(null) as Enumeration<T>;
+                    StartValueAttribute sv = prop.GetCustomAttribute<StartValueAttribute>();
+                    Enumeration<T> some = prop.GetValue(null) as Enumeration<T>;
                     if (some == null)
                     {
                         some = (Enumeration<T>)type.GetConstructors((BindingFlags)(-1))[0].Invoke(Array.Empty<Type>());
@@ -39,8 +36,12 @@ namespace useless.Enumeration
                         some.value = value;
                         prop.SetValue(null, some);
                     }
-                    else value = some.value;
-                            value = Calculator<T>.Inc(value);
+                    else
+                    {
+                        value = some.value;
+                    }
+
+                    value = Calculator<T>.Inc(value);
                     dict.Add(value, prop.Name);
                 }
             }
@@ -48,17 +49,17 @@ namespace useless.Enumeration
 
         public static string[] GetNames(Type type)
         {
-            if (!values.TryGetValue(type, out var dict))
+            if (!values.TryGetValue(type, out Dictionary<T, string> dict))
                 return null;
-            var result = new string[dict.Count];
+            string[] result = new string[dict.Count];
             dict.Values.CopyTo(result, 0);
             return result;
         }
 
         public override string ToString()
         {
-            var dict = values[GetType()];
-            if (dict.TryGetValue(value, out var str))
+            Dictionary<T, string> dict = values[GetType()];
+            if (dict.TryGetValue(value, out string str))
                 return str;
             return value.ToString();
         }
@@ -75,23 +76,17 @@ namespace useless.Enumeration
         DBNull,
         String;
 
-        TypeCode() { }
-        static TypeCode() { _ = new TypeCode(); }
+        private TypeCode() { }
+        static TypeCode() => _ = new TypeCode();
     }
 
     [System.AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    sealed class StartValueAttribute : Attribute
+    internal sealed class StartValueAttribute : Attribute
     {
-        readonly object startValue;
+        private readonly object startValue;
 
-        public StartValueAttribute(object positionalString)
-        {
-            startValue = positionalString;
-        }
+        public StartValueAttribute(object positionalString) => startValue = positionalString;
 
-        public object StartValue
-        {
-            get { return startValue; }
-        }
+        public object StartValue => startValue;
     }
 }

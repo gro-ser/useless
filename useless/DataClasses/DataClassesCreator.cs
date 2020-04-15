@@ -2,17 +2,13 @@
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CSharp.RuntimeBinder;
 
 namespace useless.DataClasses
 {
     public class DataClassesCreator
     {
-        string typeName;
-        Dictionary<string, (Type, object)> properties;
+        private readonly string typeName;
+        private readonly Dictionary<string, (Type, object)> properties;
 
         public DataClassesCreator(string typeName)
         {

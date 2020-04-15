@@ -9,26 +9,29 @@ namespace useless
         public delegate SetValue OnProperty(string name);
         public delegate OnProperty SetValue(object item);
 
-        props properties = new props();
-        static PropertyInfo[] infos = typeof(T).GetProperties();
-        string prop;
+        private readonly props properties = new props();
+        private static readonly PropertyInfo[] infos = typeof(T).GetProperties();
+        private string prop;
 
-        PropertyInfo GetProp(string name)
+        private PropertyInfo GetProp(string name)
         {
             for (int i = 0, length = infos.Length; i < length; i++)
             {
-                if (name == infos[i].Name) return infos[i];
+                if (name == infos[i].Name)
+                    return infos[i];
             }
             throw new Exception("not found!");
         }
 
-        SetValue onProperty(string name)
+        private SetValue onProperty(string name)
         {
-            if (prop != null) throw new Exception("last property dosen't set!");
+            if (prop != null)
+                throw new Exception("last property dosen't set!");
             prop = name;
             return setValue;
         }
-        OnProperty setValue(object item)
+
+        private OnProperty setValue(object item)
         {
             properties[prop] = item;
             prop = null;
@@ -40,9 +43,12 @@ namespace useless
         public T CreateNew()
         {
             T t = new T();
-            foreach (var prop in properties)
+            foreach (System.Collections.Generic.KeyValuePair<string, object> prop in properties)
+            {
                 GetProp(prop.Key)
                     .SetValue(t, prop.Value);
+            }
+
             return t;
         }
     }

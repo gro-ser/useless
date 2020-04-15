@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -43,7 +42,7 @@ namespace useless
         public abstract T mod(T a, T b);
         public virtual T zero => default(T);
 
-        static Dictionary<Type, object>
+        private static readonly Dictionary<Type, object>
             dic = new Dictionary<Type, object>()
         {
             { typeof(int), new IntCalc() },
@@ -56,7 +55,8 @@ namespace useless
 
         public static VeryMath<T> GetDefault()
         {
-            if (!dic.ContainsKey(typeof(T))) return null;
+            if (!dic.ContainsKey(typeof(T)))
+                return null;
             return dic[typeof(T)] as VeryMath<T>;
         }
     }
@@ -161,8 +161,8 @@ namespace useless
         public override bool greater(T a, T b) => a.CompareTo(b) > 0;
         public override bool less(T a, T b) => a.CompareTo(b) < 0;
 
-        static long l(T x) => Convert.ToInt64(x);
-        static T t(long x) => (T)Enum.ToObject(typeof(T), x);
+        private static long l(T x) => Convert.ToInt64(x);
+        private static T t(long x) => (T)Enum.ToObject(typeof(T), x);
         public override T sum(T a, T b) => t(l(a) + l(b));
         public override T sub(T a, T b) => t(l(a) - l(b));
         public override T mul(T a, T b) => t(l(a) * l(b));
@@ -172,17 +172,19 @@ namespace useless
 
     public static class VeryMath
     {
-        const string @class = @"using System;
+        private const string @class = @"using System;
 using {1};
 class {0}Calculator : SafeVeryMath<{0}>
 {{
 {2}}}";
+
         // Format(<classname>, <namespace>, <operators>)
-        const string method
+        private const string method
             //= "\tpublic override {0} {1}({2} a, {2} b) => a {3} b;\r\n";
             = "static public num operator {3} (num a, num b) => new num(a.self {3} b.self);\r\n";
+
         // Format(<ret.type>, <opname>, <<T>>, <operator>)
-        static Dictionary<Type, object>
+        private static readonly Dictionary<Type, object>
     dic = new Dictionary<Type, object>()
 {
             { typeof(int), new IntCalc() },
@@ -192,10 +194,9 @@ class {0}Calculator : SafeVeryMath<{0}>
             { typeof(decimal), new DecimalCalc() },
             { typeof(BigInteger), new BigIntegerCalc() }
 };
-
-        const int operatorsCout = 8;
-        static (string Name, string Method, string Operator)[]
-            methodInfo = new (string,string,string)[operatorsCout]
+        private const int operatorsCout = 8;
+        private static readonly (string Name, string Method, string Operator)[]
+            methodInfo = new (string, string, string)[operatorsCout]
         {
             ("op_Addition",     "sum",      "+"),
             ("op_Subtraction",  "sub",      "-"),
@@ -209,26 +210,29 @@ class {0}Calculator : SafeVeryMath<{0}>
 
         public static VeryMath<T> GetDefault<T>()
         {
-            if (!dic.ContainsKey(typeof(T))) return CompileNew<T>();
+            if (!dic.ContainsKey(typeof(T)))
+                return CompileNew<T>();
             return dic[typeof(T)] as VeryMath<T>;
         }
 
         public static VeryMath<T> CompileNew<T>()
         {
-            var sb = new StringBuilder();
-            var type = typeof(T);
-            var types = new Type[] { type, type };
+            StringBuilder sb = new StringBuilder();
+            Type type = typeof(T);
+            Type[] types = new Type[] { type, type };
 
             for (int i = 0; i < operatorsCout; i++)
             {
-                var met = type.GetMethod(methodInfo[i].Name, types);
-                if (met == null) continue;
+                System.Reflection.MethodInfo met = type.GetMethod(methodInfo[i].Name, types);
+                if (met == null)
+                    continue;
                 sb.AppendFormat(method, met.ReturnType.Name,
                     methodInfo[i].Method, type.Name, methodInfo[i].Operator);
             }
-            var nspace = type.Namespace;
-            if (string.IsNullOrWhiteSpace(nspace)) nspace = "System";
-            var newClassCode = string.Format(@class, type.Name, nspace, sb.ToString());
+            string nspace = type.Namespace;
+            if (string.IsNullOrWhiteSpace(nspace))
+                nspace = "System";
+            string newClassCode = string.Format(@class, type.Name, nspace, sb.ToString());
             File.WriteAllText(type.Name + "Calculator.cs", newClassCode);
             return null;
             //newClassCode= nameof(VeryMath<T>.sum);
@@ -240,41 +244,52 @@ class {0}Calculator : SafeVeryMath<{0}>
     {
         public static T Fibonacci<T>(int n, VeryMath<T> calc = null)
         {
-            if (calc == null) calc = VeryMath<T>.GetDefault();
+            if (calc == null)
+                calc = VeryMath<T>.GetDefault();
             T c, b = calc.convert(1), a = calc.convert(0);
             while (n-- > 0)
             {
-                c = a; a = calc.sum(a, b); b = c;
+                c = a;
+                a = calc.sum(a, b);
+                b = c;
             }
             return a;
         }
         public static T Max<T>(IComparator<T> comp, T a, T b) => comp.greater(a, b) ? a : b;
         public static T Sum<T>(IOperator<T> op, params T[] arr) => Sum<T>(op, arr, arr.Length - 1);
-        static T Sum<T>(IOperator<T> op, T[] arr, int len) => len == 0 ? arr[0] :
+        private static T Sum<T>(IOperator<T> op, T[] arr, int len) => len == 0 ? arr[0] :
             op.sum(arr[len], Sum<T>(op, arr, len - 1));
 
         public static void WTF()
         {
             VeryMath<int> vm;
-            var sw = Stopwatch.StartNew();
+            Stopwatch sw = Stopwatch.StartNew();
             vm = new IntCalc();
-            Console.WriteLine("IntCalc()    = {0}", sw.ElapsedTicks); sw.Restart();
+            Console.WriteLine("IntCalc()    = {0}", sw.ElapsedTicks);
+            sw.Restart();
             vm = new IntCalc();
-            Console.WriteLine("IntCalc()    = {0}", sw.ElapsedTicks); sw.Restart();
+            Console.WriteLine("IntCalc()    = {0}", sw.ElapsedTicks);
+            sw.Restart();
             vm = VeryMath<int>.GetDefault();
-            Console.WriteLine("GetDefault() = {0}", sw.ElapsedTicks); sw.Restart();
+            Console.WriteLine("GetDefault() = {0}", sw.ElapsedTicks);
+            sw.Restart();
             vm = VeryMath<int>.GetDefault();
-            Console.WriteLine("GetDefault() = {0}", sw.ElapsedTicks); sw.Restart();
+            Console.WriteLine("GetDefault() = {0}", sw.ElapsedTicks);
+            sw.Restart();
             new Calculator<int>();
-            Console.WriteLine("Calculator() = {0}", sw.ElapsedTicks); sw.Restart();
+            Console.WriteLine("Calculator() = {0}", sw.ElapsedTicks);
+            sw.Restart();
             new Calculator<float>();
-            Console.WriteLine("Calculator() = {0}", sw.ElapsedTicks); sw.Restart();
+            Console.WriteLine("Calculator() = {0}", sw.ElapsedTicks);
+            sw.Restart();
         }
-        static (string, string) wtf(string str)
+
+        private static (string, string) wtf(string str)
         {
             string res = "", abc = new string(str.OrderBy(z => z).Distinct().ToArray());
             int length = str.Length;
-            for (int i = 0; i < length; i++) res += abc.IndexOf(str[i]) + ", ";
+            for (int i = 0; i < length; i++)
+                res += abc.IndexOf(str[i]) + ", ";
             return (abc, res);
         }
     }

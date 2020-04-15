@@ -2,27 +2,21 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-class CalliTest
+internal class CalliTest
 {
-    public static void MethodA(int a)
-    {
-        Console.WriteLine("method a {0}", a);
-    }
+    public static void MethodA(int a) => Console.WriteLine("method a {0}", a);
 
-    public static void MethodB(int b)
-    {
-        Console.WriteLine("method b {0}", b);
-    }
+    public static void MethodB(int b) => Console.WriteLine("method b {0}", b);
 
     public static void Main()
     {
-        var ma = typeof(CalliTest).GetMethod("MethodA");
-        var mb = typeof(CalliTest).GetMethod("MethodB");
+        MethodInfo ma = typeof(CalliTest).GetMethod("MethodA");
+        MethodInfo mb = typeof(CalliTest).GetMethod("MethodB");
         // the dynamic method must have the same parameters
         // as the jumped to method(s)
-        var paramTypes = new Type[] { typeof(int) };
+        Type[] paramTypes = new Type[] { typeof(int) };
 
-        var m = new DynamicMethod(
+        DynamicMethod m = new DynamicMethod(
             "",
             MethodAttributes.Public | MethodAttributes.Static,
             CallingConventions.Standard,
@@ -33,7 +27,7 @@ class CalliTest
             ma.Module,
             false);
 
-        var il = m.GetILGenerator();
+        ILGenerator il = m.GetILGenerator();
 
         // code for a calli
 
@@ -54,7 +48,7 @@ class CalliTest
 
         // if (b) jmp MethodB else jmp MethodA
 
-        var lb = il.DefineLabel();
+        Label lb = il.DefineLabel();
         il.Emit(OpCodes.Brtrue, lb);
         il.Emit(OpCodes.Jmp, ma);
         il.MarkLabel(lb);
@@ -62,7 +56,7 @@ class CalliTest
 
         // call the dynamic method
 
-        var act = (Action<int>)m.CreateDelegate(typeof(Action<int>));
+        Action<int> act = (Action<int>)m.CreateDelegate(typeof(Action<int>));
 
         act(42);
     }

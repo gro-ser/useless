@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace useless
 {
@@ -130,36 +127,30 @@ namespace useless
 
         public Calculator()
         {
-            this.add = CreateDelegate<T>(Expression.AddChecked, "Addition", true);
-            this.subtract = CreateDelegate<T>(Expression.SubtractChecked, "Substraction", true);
-            this.multiply = CreateDelegate<T>(Expression.MultiplyChecked, "Multiply", true);
-            this.divide = CreateDelegate<T>(Expression.Divide, "Divide", true);
-            this.modulo = CreateDelegate<T>(Expression.Modulo, "Modulus", true);
-            this.negate = CreateDelegate(Expression.NegateChecked, "Negate", true);
-            this.plus = CreateDelegate(Expression.UnaryPlus, "Plus", true);
-            this.increment = CreateDelegate(Expression.Increment, "Increment", true);
-            this.decrement = CreateDelegate(Expression.Decrement, "Decrement", true);
-            this.leftShift = CreateDelegate<int>(Expression.LeftShift, "LeftShift", false);
-            this.rightShift = CreateDelegate<int>(Expression.RightShift, "RightShift", false);
-            this.onesComplement = CreateDelegate(Expression.OnesComplement, "OnesComplement", false);
-            this.and = CreateDelegate<T>(Expression.And, "BitwiseAnd", false);
-            this.or = CreateDelegate<T>(Expression.Or, "BitwiseOr", false);
-            this.xor = CreateDelegate<T>(Expression.ExclusiveOr, "ExclusiveOr", false);
+            add = CreateDelegate<T>(Expression.AddChecked, "Addition", true);
+            subtract = CreateDelegate<T>(Expression.SubtractChecked, "Substraction", true);
+            multiply = CreateDelegate<T>(Expression.MultiplyChecked, "Multiply", true);
+            divide = CreateDelegate<T>(Expression.Divide, "Divide", true);
+            modulo = CreateDelegate<T>(Expression.Modulo, "Modulus", true);
+            negate = CreateDelegate(Expression.NegateChecked, "Negate", true);
+            plus = CreateDelegate(Expression.UnaryPlus, "Plus", true);
+            increment = CreateDelegate(Expression.Increment, "Increment", true);
+            decrement = CreateDelegate(Expression.Decrement, "Decrement", true);
+            leftShift = CreateDelegate<int>(Expression.LeftShift, "LeftShift", false);
+            rightShift = CreateDelegate<int>(Expression.RightShift, "RightShift", false);
+            onesComplement = CreateDelegate(Expression.OnesComplement, "OnesComplement", false);
+            and = CreateDelegate<T>(Expression.And, "BitwiseAnd", false);
+            or = CreateDelegate<T>(Expression.Or, "BitwiseOr", false);
+            xor = CreateDelegate<T>(Expression.ExclusiveOr, "ExclusiveOr", false);
         }
-        
+
         /// <summary>
         /// Adds two values of the same type.
         /// Supported by: All numeric values.
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> Add
-        {
-            get
-            {
-                return this.add;
-            }
-        }
+        public Func<T, T, T> Add => add;
 
         /// <summary>
         /// Subtracts two values of the same type.
@@ -167,13 +158,7 @@ namespace useless
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> Subtract
-        {
-            get
-            {
-                return this.subtract;
-            }
-        }
+        public Func<T, T, T> Subtract => subtract;
 
         /// <summary>
         /// Multiplies two values of the same type.
@@ -181,13 +166,7 @@ namespace useless
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> Multiply
-        {
-            get
-            {
-                return this.multiply;
-            }
-        }
+        public Func<T, T, T> Multiply => multiply;
 
         /// <summary>
         /// Divides two values of the same type.
@@ -195,13 +174,7 @@ namespace useless
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> Divide
-        {
-            get
-            {
-                return this.divide;
-            }
-        }
+        public Func<T, T, T> Divide => divide;
 
         /// <summary>
         /// Divides two values of the same type and returns the remainder.
@@ -209,13 +182,7 @@ namespace useless
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> Modulo
-        {
-            get
-            {
-                return this.modulo;
-            }
-        }
+        public Func<T, T, T> Modulo => modulo;
 
         /// <summary>
         /// Gets the negative value of T.
@@ -223,26 +190,14 @@ namespace useless
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T> Negate
-        {
-            get
-            {
-                return this.negate;
-            }
-        }
+        public Func<T, T> Negate => negate;
 
         /// <summary>
         /// Gets the negative value of T.
         /// Supported by: All numeric values.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T> Plus
-        {
-            get
-            {
-                return this.plus;
-            }
-        }
+        public Func<T, T> Plus => plus;
 
         /// <summary>
         /// Gets the negative value of T.
@@ -250,13 +205,7 @@ namespace useless
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T> Increment
-        {
-            get
-            {
-                return this.increment;
-            }
-        }
+        public Func<T, T> Increment => increment;
 
         /// <summary>
         /// Gets the negative value of T.
@@ -264,103 +213,61 @@ namespace useless
         /// </summary>
         /// <exception cref="OverflowException"/>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T> Decrement
-        {
-            get
-            {
-                return this.decrement;
-            }
-        }
+        public Func<T, T> Decrement => decrement;
 
         /// <summary>
         /// Shifts the number to the left.
         /// Supported by: All integral types.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, int, T> LeftShift
-        {
-            get
-            {
-                return this.leftShift;
-            }
-        }
+        public Func<T, int, T> LeftShift => leftShift;
 
         /// <summary>
         /// Shifts the number to the right.
         /// Supported by: All integral types.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, int, T> RightShift
-        {
-            get
-            {
-                return this.rightShift;
-            }
-        }
+        public Func<T, int, T> RightShift => rightShift;
 
         /// <summary>
         /// Inverts all bits inside the value.
         /// Supported by: All integral types.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T> OnesComplement
-        {
-            get
-            {
-                return this.onesComplement;
-            }
-        }
+        public Func<T, T> OnesComplement => onesComplement;
 
         /// <summary>
         /// Performs a bitwise OR.
         /// Supported by: All integral types.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> Or
-        {
-            get
-            {
-                return this.or;
-            }
-        }
+        public Func<T, T, T> Or => or;
 
         /// <summary>
         /// Performs a bitwise AND
         /// Supported by: All integral types.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> And
-        {
-            get
-            {
-                return this.and;
-            }
-        }
+        public Func<T, T, T> And => and;
 
         /// <summary>
         /// Performs a bitwise Exclusive OR.
         /// Supported by: All integral types.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public Func<T, T, T> Xor
-        {
-            get
-            {
-                return this.xor;
-            }
-        }
+        public Func<T, T, T> Xor => xor;
 
         private static Func<T, T2, T> CreateDelegate<T2>(Func<Expression, Expression, Expression> @operator, string operatorName, bool isChecked)
         {
             try
             {
-                var convertToTypeA = ConvertTo(typeof(T));
-                var convertToTypeB = ConvertTo(typeof(T2));
-                var parameterA = Expression.Parameter(typeof(T), "a");
-                var parameterB = Expression.Parameter(typeof(T2), "b");
-                var valueA = (convertToTypeA != null) ? Expression.Convert(parameterA, convertToTypeA) : (Expression)parameterA;
-                var valueB = (convertToTypeB != null) ? Expression.Convert(parameterB, convertToTypeB) : (Expression)parameterB;
-                var body = @operator(valueA, valueB);
+                Type convertToTypeA = ConvertTo(typeof(T));
+                Type convertToTypeB = ConvertTo(typeof(T2));
+                ParameterExpression parameterA = Expression.Parameter(typeof(T), "a");
+                ParameterExpression parameterB = Expression.Parameter(typeof(T2), "b");
+                Expression valueA = (convertToTypeA != null) ? Expression.Convert(parameterA, convertToTypeA) : (Expression)parameterA;
+                Expression valueB = (convertToTypeB != null) ? Expression.Convert(parameterB, convertToTypeB) : (Expression)parameterB;
+                Expression body = @operator(valueA, valueB);
 
                 if (convertToTypeA != null)
                 {
@@ -382,10 +289,10 @@ namespace useless
         {
             try
             {
-                var convertToType = ConvertTo(typeof(T));
-                var parameter = Expression.Parameter(typeof(T), "a");
-                var value = (convertToType != null) ? Expression.Convert(parameter, convertToType) : (Expression)parameter;
-                var body = @operator(value);
+                Type convertToType = ConvertTo(typeof(T));
+                ParameterExpression parameter = Expression.Parameter(typeof(T), "a");
+                Expression value = (convertToType != null) ? Expression.Convert(parameter, convertToType) : (Expression)parameter;
+                Expression body = @operator(value);
 
                 if (convertToType != null)
                 {
