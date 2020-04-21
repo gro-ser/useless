@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 
 namespace TestingTasks
@@ -43,6 +44,7 @@ namespace TestingTasks
         protected int ReadInt() => int.Parse(ReadLexem());
 
         protected void WriteString(string str) => _output.Append(str);
+        protected void WriteString(char[] str) => _output.Append(str);
         protected void Write(object obj) => _output.Append(obj);
         protected void WriteInt(int num) => _output.Append(num);
         protected void WriteChar(int num) => _output.Append((char)num);
@@ -123,16 +125,19 @@ namespace TestingTasks
             bool print,
             params (string input, string output)[] pack)
         {
+            Stopwatch sw = new Stopwatch();
             if (print)
                 LogLine($"{task}", ConsoleColor.Yellow);
             bool solved = true;
             for (int i = 0; i < pack.Length; i++)
             {
                 (string input, string output) = pack[i];
+                sw.Restart();
                 string res = task.Solve(input);
+                string time = sw.Elapsed.ToString("ss\\.ffffff");
                 (string expected, string got, int index) dif = Diff(output, res);
                 if (print)
-                    Log($"Test [{i}]: ");
+                    Log($"Test [{i}] ({time}): ");
                 if (dif == default)
                 {
                     if (print)

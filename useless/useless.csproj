@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Args.cs" />
+    <Compile Include="Automats\Scheme.cs" />
     <Compile Include="BrainFuck.cs" />
     <Compile Include="CalliTest.cs" />
     <Compile Include="Currying.cs" />
