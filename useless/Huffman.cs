@@ -55,12 +55,12 @@ namespace useless
             List<Tree> list = new List<Tree>();
             foreach (KeyValuePair<char, int> pair in dic)
                 list.Add(new Tree(pair.Key, pair.Value));
-            while (list.Count>1)
+            while (list.Count > 1)
             {
                 Tree l = list.Min();
                 list.Remove(l);
                 Tree r = list.Min();
-                _=list.Remove(r);
+                _ = list.Remove(r);
                 list.Add(new Tree(l, r, l.Count + r.Count));
             }
             return list[0].CreateDictionary();
@@ -94,7 +94,7 @@ namespace useless
                 return pair;
             }
 
-            while (res.Count>1)
+            while (res.Count > 1)
             {
                 KeyValuePair<string, int> a = findMin();
                 res.Remove(a.Key);

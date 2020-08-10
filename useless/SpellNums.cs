@@ -70,7 +70,7 @@ namespace useless
         }
         public IEnumerable<string> StepSeq(int stepCount = 10)
         {
-            while (stepCount--> 0)
+            while (stepCount-- > 0)
                 yield return Step();
         }
     }

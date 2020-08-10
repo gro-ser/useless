@@ -6,7 +6,7 @@ namespace useless
 {
     public partial class Speaker : Form
     {
-        private void WriteLine(string str) => textBox1.AppendText(str+"\r\n");
+        private void WriteLine(string str) => textBox1.AppendText(str + "\r\n");
 
         private readonly VoiceHints voiceHints = new Speaker.VoiceHints();
         private readonly System.Speech.Synthesis.SpeechSynthesizer synth = new SpeechSynthesizer();

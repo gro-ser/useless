@@ -626,6 +626,7 @@ namespace useless
         [STAThread]
         private static int Main(string[] args)
         {
+            //goto start;
             bool print = true;
 
             (string, string)[] task1Data =
@@ -1071,8 +1072,8 @@ KKXNLXXHQSQOMYJXZIPYZLGOXKSANGYDDW
 KKXNLXXHQSQOMYJXZIPYZLGOXKHPEXSDBBS
 KKXNLXXHQSQOMYJXZLUSGUSOSDKKRY", "PTIDGAWROQZSHVMNYFJELUCBXK")
             };
-            Console.WriteLine("Task1 passed: {0}", TestingTask.IsSolved(new Task1.V1(), print, task1Data));
-            Console.WriteLine("Task1 passed: {0}", TestingTask.IsSolved(new Task1.V2(), print, task1Data));
+            //Console.WriteLine("Task1 passed: {0}", TestingTask.IsSolved(new Task1.V1(), print, task1Data));
+            //Console.WriteLine("Task1 passed: {0}", TestingTask.IsSolved(new Task1.V2(), print, task1Data));
 
             (string, string)[] task3Data =
             {
@@ -1174,16 +1175,22 @@ KKXNLXXHQSQOMYJXZLUSGUSOSDKKRY", "PTIDGAWROQZSHVMNYFJELUCBXK")
 0 0 85 0 0 305 0 306 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 164 0 0 0 0 0 0 0 255 0 0 0
 0 408 671 505 318 891 0 892 146 0 534 0 640 142 48 0 0 504 564 470 643 0 596 750 224 144 0 0 0 50 0 841 0 515 0")
             };
-            Console.WriteLine("Task3 passed: {0}", TestingTask.IsSolved(new Task3.V1(), print, task3Data));
             Console.WriteLine("Task3 passed: {0}", TestingTask.IsSolved(new Task3.V2(), print, task3Data));
+            Console.WriteLine("Task3 passed: {0}", TestingTask.IsSolved(new Task3.V1(), print, task3Data));
 
             Console.ReadLine();
 
             return 0;
+            string? bfsrc = @"";
+            Expression<Action> lambda = BrainFuck.LambdaSource(
+                bfsrc, true);
 
-            global::System.Linq.Expressions.Expression<global::System.Action> lambda = BrainFuck.LambdaSource(@"+[>+]");
-            Program.print(lambda);
-            //var wtf = lambda.Compile();wtf();
+            //Program.print(lambda);
+            Action? wtf = lambda.Compile();
+            wtf();
+            return 0;
+            Console.ReadLine();
+        start:
             Application.EnableVisualStyles();
             new RegexSolver().ShowDialog();
             //Parallel.For(0, int.MaxValue, TestDigitCount);

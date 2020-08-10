@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LinuxFSEmulator
+﻿namespace LinuxFSEmulator
 {
-    class FSGroup
+    internal class FSGroup
     {
         public string Name { get; private set; }
         public override string ToString() => Name;

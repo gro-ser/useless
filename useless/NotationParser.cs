@@ -72,7 +72,9 @@ public class PostFixNotationParser : NotationParser
             skip(str, ref index);
             string key = next(str, ref index, length);
             if (constants.ContainsKey(key))
+            {
                 stack.Push(constants[key]);
+            }
             else if (operators.ContainsKey(key))
             {
                 if (stack.Count > 1)
@@ -86,9 +88,13 @@ public class PostFixNotationParser : NotationParser
                 }
             }
             else if (double.TryParse(key, out value))
+            {
                 stack.Push(value);
+            }
             else
+            {
                 return null;
+            }
         }
         if (stack.Count == 1)
             return stack.Pop();
@@ -113,7 +119,9 @@ public class PreFixNotationParser : NotationParser
             skip(str, ref index);
             string key = next(str, ref index, length);
             if (constants.ContainsKey(key))
+            {
                 tmp[i++] = (constants[key]);
+            }
             else if (operators.ContainsKey(key))
             {
                 if (i != 2) // TODO i == 0
@@ -122,9 +130,14 @@ public class PreFixNotationParser : NotationParser
                     return null;
             }
             else if (double.TryParse(key, out double value))
+            {
                 tmp[i++] = (value);
+            }
             else
+            {
                 return null;
+            }
+
             if (i == 2)
             {
                 if (stack.Count == 0)

@@ -41,13 +41,16 @@ namespace useless
         {
             left = right = top = bottom = null;
 
-            width = int.Parse(textBox1.Text);
-            height = int.Parse(textBox2.Text);
+            width = int.Parse(textBox2.Text);
+            height = int.Parse(textBox1.Text);
 
             dgv.Columns.Clear();
             dgv.Columns.Add("left", "left");
+            dgv.Columns[0].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             for (int i = 1; i <= width; i++)
+            {
                 dgv.Columns.Add(i + "", "#" + i);
+            }
             dgv.Columns.Add("right", "right");
 
             dgv.Columns[0].DefaultCellStyle.BackColor = Color.LightCyan;
@@ -72,7 +75,7 @@ namespace useless
             //    for (int y = 1; y <= height; ++y)
             //        dgv[x, y].ReadOnly = true;
 
-            //ClearGrid();
+            //ClearGrid();            
 
             foreach (DataGridViewColumn col in dgv.Columns)
                 col.SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -103,7 +106,17 @@ namespace useless
         {
             if (string.IsNullOrEmpty(pattern))
                 pattern = ".*";
-            return new Regex($"^{pattern}$", settings.RegexOptions);
+            Regex regex;
+            try
+            {
+                regex = new Regex($"^{pattern}$", settings.RegexOptions);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message);
+                regex = new Regex(".*");
+            }
+            return regex;
         }
 
         private void ClearGrid()
@@ -138,7 +151,7 @@ namespace useless
             for (int i = 1; i <= height; i++)
                 sources[i - 1] = dgv[col, i].FormattedValue.ToString();
 
-            string[] res = SafeGetStringsByRegex(height, sources, new[] { top[col], bottom[col] });
+            string[] res = SafeGetStringsByRegex(height, sources, new[] { top?[col], bottom?[col] });
             if (res != null)
             {
                 for (int i = 1; i <= height; i++)
@@ -166,7 +179,7 @@ namespace useless
             for (int i = 1; i <= width; i++)
                 sources[i - 1] = dgv[i, row].FormattedValue.ToString();
 
-            string[] res = SafeGetStringsByRegex(width, sources, new[] { left[row], right[row] });
+            string[] res = SafeGetStringsByRegex(width, sources, new[] { left?[row], right?[row] });
             if (res != null)
             {
                 for (int i = 1; i <= width; i++)
@@ -211,10 +224,15 @@ namespace useless
                         }
                     }
                     else
+                    {
                         UpdateByRow(row++);
+                    }
                 }
                 else
+                {
                     UpdateByColumn(col++);
+                }
+
                 Refresh();
             }
             MessageBox.Show("DONE!");
@@ -234,7 +252,7 @@ namespace useless
                         str = @$"""{str}""";
                     sw.Write(str);
                     if (j < dgv.ColumnCount - 1)
-                        sw.Write(";\0");
+                        sw.Write("; ");
                 }
                 sw.WriteLine();
             }
@@ -247,7 +265,7 @@ namespace useless
             using StreamReader sr = new StreamReader("temp.csv");
             for (int i = 0; i <= height + 1; i++)
             {
-                string[] tmp = sr.ReadLine()?.Split(new[] { ";\0" }, StringSplitOptions.None);
+                string[] tmp = sr.ReadLine()?.Split(new[] { "; " }, StringSplitOptions.None);
                 if (tmp == null)
                     return;
                 for (int j = 0; j <= width + 1; j++)
@@ -275,7 +293,7 @@ namespace useless
             {
                 if (chr == null)
                     throw new Exception("chr is null!");
-                if (chr.Length>2&&chr[0]==('\\'))
+                if (chr.Length > 2 && chr[0] == ('\\'))
                     chr = Regex.Unescape(chr);
                 if (chr.Length == 1)
                     return chr[0];

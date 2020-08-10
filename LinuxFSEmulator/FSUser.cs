@@ -1,16 +1,14 @@
 ﻿//#nullable enable
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LinuxFSEmulator
 {
-    class FSUser
+    internal class FSUser
     {
         public string Name { get; private set; }
         public override string ToString() => Name;
 
-        private List<FSGroup> groups = new List<FSGroup>();
+        private readonly List<FSGroup> groups = new List<FSGroup>();
         public IEnumerable<FSGroup> Groups => groups.AsReadOnly();
 
         public void AddToGroup(FSGroup group) => groups.Add(group);

@@ -37,7 +37,7 @@ namespace TestingTasks
             string result = _input.ToString(0, ind);
             while (ind < length && char.IsWhiteSpace(_input[ind]))
                 ++ind;
-            _=_input.Remove(0, ind);
+            _ = _input.Remove(0, ind);
             return result;
         }
 

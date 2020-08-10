@@ -3,7 +3,7 @@
 namespace LinuxFSEmulator
 {
     [Flags]
-    enum Permision : byte
+    internal enum Permision : byte
     {
         Read = 1,
         Write = 2,

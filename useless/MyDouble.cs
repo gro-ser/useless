@@ -26,8 +26,11 @@ namespace useless
                     throw new Exception("len=0");
                 double ans = arr[0];
                 for (int i = 1; i < length; i++)
+                {
                     if (arr[i] < ans)
                         ans = arr[i];
+                }
+
                 return ans;
             }
         }
@@ -39,8 +42,11 @@ namespace useless
                     throw new Exception("len=0");
                 double ans = arr[0];
                 for (int i = 1; i < length; i++)
+                {
                     if (arr[i] > ans)
                         ans = arr[i];
+                }
+
                 return ans;
             }
         }

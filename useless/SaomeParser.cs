@@ -9,7 +9,7 @@ namespace useless
         {
             (float a, float b, float c) = (0f, 0f, 0f);
             int len = expr.Length, i = 0, sub;
-            while (i<len)
+            while (i < len)
             {
                 // skip whitespaces
                 while (char.IsWhiteSpace(expr[i]))

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using static System.Linq.Expressions.Expression;
 
 namespace useless
 {
     internal class BrainFuck
     {
-        private enum OperationType { Undefined, Change, Shift, Loop, Output, Input }
+        private enum OperationType { Undefined, Change, Shift, LoopIn, LoopOut, Output, Input }
 
         private static OperationType GetOperationType(char sym)
         {
@@ -21,8 +20,9 @@ namespace useless
                 case '>':
                     return OperationType.Shift;
                 case '[':
+                    return OperationType.LoopIn;
                 case ']':
-                    return OperationType.Loop;
+                    return OperationType.LoopOut;
                 case '.':
                     return OperationType.Output;
                 case ',':
@@ -32,35 +32,35 @@ namespace useless
             }
         }
 
-        private List<Expression> body;
-        private Stack<List<Expression>> blocks;
-        private readonly ParameterExpression array, index, bytes;
-        private readonly ParameterExpression[] variables;
-        private readonly int elementCount;
-        private readonly bool printAtEnd;
+        private List<Expression> _body;
+        private Stack<List<Expression>> _blocks;
+        private readonly ParameterExpression _array, _index, _bytes;
+        private readonly ParameterExpression[] _variables;
+        private readonly int _elementCount;
+        private bool _lazyPrint;
 
-        public BrainFuck(int ElementCount, bool PrintAtEnd)
+        public BrainFuck(int ElementCount, bool LazyPrint)
         {
-            printAtEnd = PrintAtEnd;
-            elementCount = ElementCount;
-            array = Variable(typeof(byte[]), "array");
-            index = Variable(typeof(int), "index");
-            bytes = Variable(typeof(List<byte>), "bytes");
-            variables = new[] { array, index, bytes };
+            _lazyPrint = LazyPrint;
+            _elementCount = ElementCount;
+            _array = Variable(typeof(byte[]), "array");
+            _index = Variable(typeof(int), "index");
+            _bytes = Variable(typeof(List<byte>), "bytes");
+            _variables = new[] { _array, _index, _bytes };
         }
 
         public BrainFuck() : this(30000, true) { }
 
-        public Action Compile(string source) =>
-            CreateLambda(source).Compile();
+
+        public Action Compile(string source) => CreateLambda(source).Compile();
 
         public Expression<Action> CreateLambda(string source)
         {
             int acc = 0;
             OperationType type, last = OperationType.Undefined;
-            blocks = new Stack<List<Expression>>();
-            body = new List<Expression>();
-            blocks.Push(body);
+            _blocks = new Stack<List<Expression>>();
+            _body = new List<Expression>();
+            _blocks.Push(_body);
             Startup();
             foreach (char x in source)
             {
@@ -82,8 +82,11 @@ namespace useless
                     case OperationType.Shift:
                         acc += x == '>' ? 1 : -1;
                         break;
-                    case OperationType.Loop:
-                        AddLoop(x);
+                    case OperationType.LoopIn:
+                        AddLoopIn();
+                        break;
+                    case OperationType.LoopOut:
+                        AddLoopOut();
                         break;
                     case OperationType.Output:
                         Add(Output());
@@ -93,49 +96,59 @@ namespace useless
                         break;
                 }
             }
-            if (printAtEnd)
+            if (_lazyPrint)
             {
-                Add(Call(null, ((Action<string>)Console.WriteLine).Method,
-                    Call(Constant(Encoding.UTF8), "GetString", null,
-                        Call(bytes, "ToArray", null))));
+                LazyPrint();
             }
 
-            return Lambda<Action>(Block(variables, body));
+            _body.RemoveAll(x => x == null);
+            return Lambda<Action>(Block(_variables, _body));
         }
+
+        private void LazyPrint()
+        {
+            Add(Call(null, ((Action<string>)Console.Write).Method,
+                Call(Encoding(), "GetString", null,
+                    Call(_bytes, "ToArray", null))));
+            Add(Call(_bytes, "Clear", null));
+        }
+
+        private static ConstantExpression Encoding() => Constant(System.Text.Encoding.Default);
 
         private void Startup()
         {
-            body.Add(Assign(index, Constant(0)));
-            body.Add(Assign(array, NewArrayBounds(typeof(byte), Constant(elementCount))));
-            if (printAtEnd)
-                body.Add(Assign(bytes, New(typeof(List<byte>))));
+            _body.Add(Assign(_index, Constant(0)));
+            _body.Add(Assign(_array, NewArrayBounds(typeof(byte), Constant(_elementCount))));
+            if (_lazyPrint)
+                _body.Add(Assign(_bytes, New(typeof(List<byte>))));
         }
 
         private Expression Operation(OperationType type, int acc)
         {
+            if (0 == acc)
+                return null;
             switch (type)
             {
-                case OperationType.Change:
-                    return Assign(Element(), Convert(Expression.Add(
-                        Convert(Element(), typeof(int)), Constant(acc)), typeof(byte)));
-                case OperationType.Shift:
-                    return AddAssign(index, Constant(acc));
+                case OperationType.Change when (0 < acc):
+                    return Assign(Element(), Convert(Expression.Add(Convert(Element(), typeof(int)), Constant(acc)), typeof(byte)));
+                case OperationType.Change when (0 > acc):
+                    return Assign(Element(), Convert(Expression.Subtract(Convert(Element(), typeof(int)), Constant(-acc)), typeof(byte)));
+                case OperationType.Shift when (0 < acc):
+                    return AddAssign(_index, Constant(acc));
+                case OperationType.Shift when (0 > acc):
+                    return SubtractAssign(_index, Constant(-acc));
                 default:
                     throw new ArgumentException();
             }
         }
 
-        private Expression Element() =>
-            ArrayAccess(array, index);
+        private Expression Element() => ArrayAccess(_array, _index);
 
-        private void AddLoop(char x)
+        private void AddLoopIn() => _blocks.Push(new List<Expression>());
+
+        private void AddLoopOut()
         {
-            if (x == '[')
-            {
-                blocks.Push(new List<Expression>());
-                return;
-            }
-            List<Expression> list = blocks.Pop();
+            List<Expression> list = _blocks.Pop();
             LabelTarget label = Label();
             Add(Loop(
                 IfThenElse(
@@ -146,14 +159,19 @@ namespace useless
         }
 
         private Expression Output() =>
-            printAtEnd ? Call(bytes, "Add", null, Element()) :
-            Call(((Action<char>)Console.Write).Method, Convert(Element(), typeof(char)));
+            _lazyPrint ? Call(_bytes, "Add", null, Element()) :
+            //Call(((Action<char>)Console.Write).Method, Convert(Element(), typeof(char)));
+            Call(((Action<string>)Console.Write).Method, Call(Encoding(), "GetString", null, _array, _index, Constant(1)));
 
-        private Expression Input() =>
-            Convert(MakeMemberAccess(Call(((Func<ConsoleKeyInfo>)Console.ReadKey).Method),
-                typeof(ConsoleKeyInfo).GetProperty("Key")), typeof(byte));
+        private Expression Input()
+        {
+            if (_lazyPrint)
+                LazyPrint();
+            return Assign(Element(), Convert(MakeMemberAccess(Call(((Func<ConsoleKeyInfo>)Console.ReadKey).Method),
+                typeof(ConsoleKeyInfo).GetProperty("KeyChar")), typeof(byte)));
+        }
 
-        private void Add(Expression expr) => blocks.Peek().Add(expr);
+        private void Add(Expression expr) => _blocks.Peek().Add(expr);
 
         private static readonly BrainFuck instance = new BrainFuck();
 
@@ -163,5 +181,13 @@ namespace useless
         public static Expression<Action> LambdaSource(string source) =>
             instance.CreateLambda(source);
 
+        public static Expression<Action> LambdaSource(string source, bool lazyPrint)
+        {
+            bool last = instance._lazyPrint;
+            instance._lazyPrint = lazyPrint;
+            Expression<Action> result = instance.CreateLambda(source);
+            instance._lazyPrint = last;
+            return result;
+        }
     }
 }

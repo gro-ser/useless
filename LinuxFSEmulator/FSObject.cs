@@ -1,11 +1,8 @@
 ﻿//#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LinuxFSEmulator
 {
-    abstract class FSObject
+    internal abstract class FSObject
     {
         public string Name { get; protected set; }
         public FSObject Parent { get; protected set; }
@@ -16,7 +13,8 @@ namespace LinuxFSEmulator
         public virtual bool IsDirectory => false;
 
     }
-    class File:FSObject
+
+    internal class File : FSObject
     {
         public File(string name) => Name = name;
     }

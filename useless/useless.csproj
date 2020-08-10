@@ -208,6 +208,7 @@
     <None Include="Resources\t.zip" />
     <None Include="Resources\VK.zip" />
     <None Include="Resources\руководство.zip" />
+    <None Include="strutils.csx" />
     <None Include="start.csx" />
   </ItemGroup>
   <ItemGroup>
